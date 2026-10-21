@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgres:18.6-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cineclue}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cineclue}
+      POSTGRES_DB: ${POSTGRES_DB:-cineclue}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres18-data:/var/lib/postgresql
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-cineclue}:${POSTGRES_PASSWORD:-cineclue}@db:5432/${POSTGRES_DB:-cineclue}
+      DAILY_SECRET: ${DAILY_SECRET:-local-development-only-replace-this-with-32-random-bytes}
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://localhost:5173}
+      NODE_ENV: development
+      PORT: 3001
+      STATIC_ROOT: /app/apps/web/dist
+      TMDB_API_TOKEN: ${TMDB_API_TOKEN:-}
+    volumes:
+      - ./data:/app/data:ro
+    ports:
+      - "127.0.0.1:5173:3001"
+    depends_on:
+      db:
+        condition: service_healthy
+    init: true
+    healthcheck:
+      test:
+        [
+          CMD,
+          node,
+          -e,
+          "fetch('http://127.0.0.1:3001/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      start_period: 180s
+      retries: 3
+volumes:
+  postgres18-data:

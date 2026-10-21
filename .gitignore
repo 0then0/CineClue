@@ -1,0 +1,17 @@
+node_modules/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+
+data/*.local.json
+
+data/*.local.json.tmp
+
+.cache/
+*.dump
+
+data/*.json.tmp

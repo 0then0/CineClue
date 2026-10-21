@@ -1,0 +1,528 @@
+[
+  {
+    "id": "popular",
+    "name": {
+      "en": "All movies",
+      "ru": "Все фильмы"
+    },
+    "description": {
+      "en": "The complete curated catalog",
+      "ru": "Весь отобранный каталог"
+    },
+    "rules": {}
+  },
+  {
+    "id": "animation",
+    "name": {
+      "en": "Animation",
+      "ru": "Анимация"
+    },
+    "description": {
+      "en": "Animated features, including Disney, Pixar and Japanese animation",
+      "ru": "Полнометражные мультфильмы: Disney, Pixar и японская анимация"
+    },
+    "rules": {
+      "movieIds": [
+        "Q318975",
+        "Q756238",
+        "Q13619743",
+        "Q216929",
+        "Q485983",
+        "Q18517638",
+        "Q218894",
+        "Q188439",
+        "Q5815826",
+        "Q37785",
+        "Q271189",
+        "Q28891",
+        "Q36092",
+        "Q179673",
+        "Q15270647",
+        "Q213787",
+        "Q223359",
+        "Q126796",
+        "Q13091172",
+        "Q213326",
+        "Q182254",
+        "Q215518",
+        "Q83161",
+        "Q174555",
+        "Q188474",
+        "Q334132",
+        "Q171300",
+        "Q187726",
+        "Q223163",
+        "Q40895",
+        "Q483815",
+        "Q212792",
+        "Q36479",
+        "Q182153",
+        "Q190910",
+        "Q104905",
+        "Q9321426",
+        "Q486609",
+        "Q208696",
+        "Q190135",
+        "Q165512",
+        "Q215365",
+        "Q187266",
+        "Q132863",
+        "Q216153",
+        "Q40302",
+        "Q170035",
+        "Q129193",
+        "Q305250",
+        "Q24733929",
+        "Q4447",
+        "Q202371",
+        "Q39722",
+        "Q171048",
+        "Q174811",
+        "Q179503",
+        "Q189875",
+        "Q537407",
+        "Q18647981",
+        "Q29588607",
+        "Q6144664",
+        "Q187278",
+        "Q134430",
+        "Q270470",
+        "Q156401",
+        "Q191753",
+        "Q215617",
+        "Q43051",
+        "Q172284",
+        "Q103372692",
+        "Q204662",
+        "Q184701",
+        "Q4341553",
+        "Q246283",
+        "Q943192",
+        "Q199839",
+        "Q19090",
+        "Q39571",
+        "Q641362",
+        "Q116764712",
+        "Q392530",
+        "Q754736",
+        "Q245227",
+        "Q270940",
+        "Q486588",
+        "Q208131",
+        "Q191803",
+        "Q29011",
+        "Q221679",
+        "Q637212",
+        "Q192212",
+        "Q21697406",
+        "Q27044293",
+        "Q155653",
+        "Q373096",
+        "Q610502",
+        "Q465275",
+        "Q76448600",
+        "Q322328",
+        "Q980041",
+        "Q104845027",
+        "Q186572",
+        "Q35951",
+        "Q329316",
+        "Q495850",
+        "Q498434",
+        "Q863963",
+        "Q22997984",
+        "Q236728",
+        "Q888131",
+        "Q47482560",
+        "Q498375",
+        "Q196602",
+        "Q498577",
+        "Q8885676",
+        "Q608079"
+      ]
+    }
+  },
+  {
+    "id": "action",
+    "name": {
+      "en": "Action",
+      "ru": "Боевики"
+    },
+    "description": {
+      "en": "Action films from the catalog",
+      "ru": "Фильмы подборки «Боевики»"
+    },
+    "rules": {
+      "genreIds": ["Q188473", "Q3990883"]
+    }
+  },
+  {
+    "id": "adventure",
+    "name": {
+      "en": "Adventure",
+      "ru": "Приключения"
+    },
+    "description": {
+      "en": "Adventure films from the catalog",
+      "ru": "Фильмы подборки «Приключения»"
+    },
+    "rules": {
+      "genreIds": ["Q319221"]
+    }
+  },
+  {
+    "id": "comedy",
+    "name": {
+      "en": "Comedy",
+      "ru": "Комедии"
+    },
+    "description": {
+      "en": "Comedy films from the catalog",
+      "ru": "Фильмы подборки «Комедии»"
+    },
+    "rules": {
+      "genreIds": ["Q157443", "Q859369", "Q860626", "Q118612349"]
+    }
+  },
+  {
+    "id": "drama",
+    "name": {
+      "en": "Drama",
+      "ru": "Драмы"
+    },
+    "description": {
+      "en": "Drama films from the catalog",
+      "ru": "Фильмы подборки «Драмы»"
+    },
+    "rules": {
+      "genreIds": ["Q130232"]
+    }
+  },
+  {
+    "id": "scifi",
+    "name": {
+      "en": "Science fiction",
+      "ru": "Научная фантастика"
+    },
+    "description": {
+      "en": "Science fiction films from the catalog",
+      "ru": "Фильмы подборки «Научная фантастика»"
+    },
+    "rules": {
+      "genreIds": ["Q471839", "Q20443008"]
+    }
+  },
+  {
+    "id": "fantasy",
+    "name": {
+      "en": "Fantasy",
+      "ru": "Фэнтези"
+    },
+    "description": {
+      "en": "Fantasy films from the catalog",
+      "ru": "Фильмы подборки «Фэнтези»"
+    },
+    "rules": {
+      "genreIds": ["Q157394"]
+    }
+  },
+  {
+    "id": "horror",
+    "name": {
+      "en": "Horror",
+      "ru": "Ужасы"
+    },
+    "description": {
+      "en": "Horror films from the catalog",
+      "ru": "Фильмы подборки «Ужасы»"
+    },
+    "rules": {
+      "genreIds": ["Q200092"]
+    }
+  },
+  {
+    "id": "thriller",
+    "name": {
+      "en": "Thrillers",
+      "ru": "Триллеры"
+    },
+    "description": {
+      "en": "Thrillers films from the catalog",
+      "ru": "Фильмы подборки «Триллеры»"
+    },
+    "rules": {
+      "genreIds": ["Q2484376", "Q19367312", "Q109733304", "Q11304653"]
+    }
+  },
+  {
+    "id": "crime",
+    "name": {
+      "en": "Crime",
+      "ru": "Криминальное кино"
+    },
+    "description": {
+      "en": "Crime films from the catalog",
+      "ru": "Фильмы подборки «Криминальное кино»"
+    },
+    "rules": {
+      "genreIds": ["Q959790", "Q19367312", "Q113485322"]
+    }
+  },
+  {
+    "id": "mystery",
+    "name": {
+      "en": "Mystery",
+      "ru": "Загадки и расследования"
+    },
+    "description": {
+      "en": "Mystery films from the catalog",
+      "ru": "Фильмы подборки «Загадки и расследования»"
+    },
+    "rules": {
+      "genreIds": ["Q1200678"]
+    }
+  },
+  {
+    "id": "romance",
+    "name": {
+      "en": "Romance",
+      "ru": "Романтика"
+    },
+    "description": {
+      "en": "Romance films from the catalog",
+      "ru": "Фильмы подборки «Романтика»"
+    },
+    "rules": {
+      "genreIds": ["Q1054574", "Q860626", "Q118612349"]
+    }
+  },
+  {
+    "id": "superheroes",
+    "name": {
+      "en": "Superheroes",
+      "ru": "Супергерои"
+    },
+    "description": {
+      "en": "Superheroes films from the catalog",
+      "ru": "Фильмы подборки «Супергерои»"
+    },
+    "rules": {
+      "genreIds": ["Q1535153"]
+    }
+  },
+  {
+    "id": "musicals",
+    "name": {
+      "en": "Musicals",
+      "ru": "Мюзиклы"
+    },
+    "description": {
+      "en": "Musicals films from the catalog",
+      "ru": "Фильмы подборки «Мюзиклы»"
+    },
+    "rules": {
+      "genreIds": ["Q842256"]
+    }
+  },
+  {
+    "id": "war",
+    "name": {
+      "en": "War movies",
+      "ru": "Военное кино"
+    },
+    "description": {
+      "en": "War movies films from the catalog",
+      "ru": "Фильмы подборки «Военное кино»"
+    },
+    "rules": {
+      "genreIds": ["Q369747"]
+    }
+  },
+  {
+    "id": "classics",
+    "name": {
+      "en": "Before 1970",
+      "ru": "Классика до 1970 года"
+    },
+    "description": {
+      "en": "Cinema: Before 1970",
+      "ru": "Кино: Классика до 1970 года"
+    },
+    "rules": {
+      "yearMax": 1969
+    }
+  },
+  {
+    "id": "seventies",
+    "name": {
+      "en": "The 1970s",
+      "ru": "1970-е"
+    },
+    "description": {
+      "en": "Cinema: The 1970s",
+      "ru": "Кино: 1970-е"
+    },
+    "rules": {
+      "yearMin": 1970,
+      "yearMax": 1979
+    }
+  },
+  {
+    "id": "eighties",
+    "name": {
+      "en": "The 1980s",
+      "ru": "1980-е"
+    },
+    "description": {
+      "en": "Cinema: The 1980s",
+      "ru": "Кино: 1980-е"
+    },
+    "rules": {
+      "yearMin": 1980,
+      "yearMax": 1989
+    }
+  },
+  {
+    "id": "nineties",
+    "name": {
+      "en": "The 1990s",
+      "ru": "1990-е"
+    },
+    "description": {
+      "en": "Cinema: The 1990s",
+      "ru": "Кино: 1990-е"
+    },
+    "rules": {
+      "yearMin": 1990,
+      "yearMax": 1999
+    }
+  },
+  {
+    "id": "noughties",
+    "name": {
+      "en": "The 2000s",
+      "ru": "2000-е"
+    },
+    "description": {
+      "en": "Cinema: The 2000s",
+      "ru": "Кино: 2000-е"
+    },
+    "rules": {
+      "yearMin": 2000,
+      "yearMax": 2009
+    }
+  },
+  {
+    "id": "tens",
+    "name": {
+      "en": "The 2010s",
+      "ru": "2010-е"
+    },
+    "description": {
+      "en": "Cinema: The 2010s",
+      "ru": "Кино: 2010-е"
+    },
+    "rules": {
+      "yearMin": 2010,
+      "yearMax": 2019
+    }
+  },
+  {
+    "id": "modern",
+    "name": {
+      "en": "2020 onwards",
+      "ru": "С 2020 года"
+    },
+    "description": {
+      "en": "Cinema: 2020 onwards",
+      "ru": "Кино: С 2020 года"
+    },
+    "rules": {
+      "yearMin": 2020
+    }
+  },
+  {
+    "id": "nolan",
+    "name": {
+      "en": "Christopher Nolan",
+      "ru": "Кристофер Нолан"
+    },
+    "description": {
+      "en": "Films directed by Christopher Nolan",
+      "ru": "Режиссёр подборки: Кристофер Нолан"
+    },
+    "rules": {
+      "directorIds": ["Q25191"]
+    }
+  },
+  {
+    "id": "spielberg",
+    "name": {
+      "en": "Steven Spielberg",
+      "ru": "Стивен Спилберг"
+    },
+    "description": {
+      "en": "Films directed by Steven Spielberg",
+      "ru": "Режиссёр подборки: Стивен Спилберг"
+    },
+    "rules": {
+      "directorIds": ["Q8877"]
+    }
+  },
+  {
+    "id": "tarantino",
+    "name": {
+      "en": "Quentin Tarantino",
+      "ru": "Квентин Тарантино"
+    },
+    "description": {
+      "en": "Films directed by Quentin Tarantino",
+      "ru": "Режиссёр подборки: Квентин Тарантино"
+    },
+    "rules": {
+      "directorIds": ["Q3772"]
+    }
+  },
+  {
+    "id": "hitchcock",
+    "name": {
+      "en": "Alfred Hitchcock",
+      "ru": "Альфред Хичкок"
+    },
+    "description": {
+      "en": "Films directed by Alfred Hitchcock",
+      "ru": "Режиссёр подборки: Альфред Хичкок"
+    },
+    "rules": {
+      "directorIds": ["Q7374"]
+    }
+  },
+  {
+    "id": "scorsese",
+    "name": {
+      "en": "Martin Scorsese",
+      "ru": "Мартин Скорсезе"
+    },
+    "description": {
+      "en": "Films directed by Martin Scorsese",
+      "ru": "Режиссёр подборки: Мартин Скорсезе"
+    },
+    "rules": {
+      "directorIds": ["Q41148"]
+    }
+  },
+  {
+    "id": "miyazaki",
+    "name": {
+      "en": "Hayao Miyazaki",
+      "ru": "Хаяо Миядзаки"
+    },
+    "description": {
+      "en": "Films directed by Hayao Miyazaki",
+      "ru": "Режиссёр подборки: Хаяо Миядзаки"
+    },
+    "rules": {
+      "directorIds": ["Q55400"]
+    }
+  }
+]

@@ -1,0 +1,422 @@
+import { execFile } from "node:child_process";
+import { randomUUID } from "node:crypto";
+import { once } from "node:events";
+import type { Server } from "node:http";
+import { promisify } from "node:util";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { Catalog, loadCatalog } from "../src/catalog.ts";
+import { pool } from "../src/db.ts";
+import { Games, utcDate } from "../src/game.ts";
+import { app } from "../src/http.ts";
+
+const enabled = process.env.RUN_DB_TESTS === "1";
+describe.skipIf(!enabled)("API + disposable PostgreSQL", () => {
+  let server: Server;
+  let base: string;
+  let catalog: Catalog;
+  const cookie = () => `cineclue_visitor=${randomUUID()}`;
+  async function request(
+    path: string,
+    visitor: string,
+    body?: unknown,
+    headers: Record<string, string> = {},
+  ) {
+    const r = await fetch(`${base}${path}`, {
+      method: body === undefined ? "GET" : "POST",
+      headers: {
+        cookie: visitor,
+        ...(body === undefined ? {} : { "Content-Type": "application/json" }),
+        ...headers,
+      },
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    });
+    return { r, data: await r.json() };
+  }
+  beforeAll(async () => {
+    if (!process.env.DATABASE_URL)
+      throw new Error("Explicit DATABASE_URL for a disposable database is required");
+    catalog = await loadCatalog();
+    server = app(catalog, "test-secret-at-least-32-characters", {
+      origin: "http://localhost:5173",
+      rateLimit: 1000,
+    });
+    server.listen(0, "127.0.0.1");
+    await once(server, "listening");
+    const a = server.address();
+    if (!a || typeof a === "string") throw new Error("No port");
+    base = `http://127.0.0.1:${a.port}/api`;
+  });
+  afterAll(async () => {
+    if (server) await new Promise<void>((resolve) => server.close(() => resolve()));
+    await pool.end();
+  });
+  it("rejects unknown media IDs and restricts external image hosts", async () => {
+    const { r, data } = await request("/media/unknown-movie", cookie());
+    expect(r.status).toBe(404);
+    expect(data.error).toBe("not_found");
+    const policy = r.headers.get("content-security-policy");
+    expect(policy).toContain(
+      "img-src 'self' data: https://image.tmdb.org https://upload.wikimedia.org https://thumb.wikimedia.org;",
+    );
+    expect(policy).not.toContain("img-src *");
+    expect(policy).toContain("connect-src 'self'");
+  });
+  it("lists playable collections with accurate difficulty counts and starts an animated game", async () => {
+    const { data } = await request("/packs", cookie());
+    expect(data.packs.length).toBeGreaterThan(20);
+    expect(data.packs[0].id).toBe("popular");
+    for (const p of data.packs) {
+      for (const difficulty of ["easy", "normal", "hard"] as const) {
+        expect(p.counts[difficulty]).toBe(catalog.candidates(difficulty, p.id).length);
+        expect(p.counts[difficulty]).toBeGreaterThan(0);
+      }
+    }
+    const animation = data.packs.find((p: { id: string }) => p.id === "animation");
+    expect(animation.counts.normal).toBeGreaterThan(50);
+    const player = cookie();
+    const result = await request("/unlimited", player, { pack: "animation", difficulty: "normal" });
+    expect(result.r.status).toBe(201);
+    const stored = await pool.query("SELECT target_id FROM game_session WHERE id=$1", [
+      result.data.id,
+    ]);
+    expect(
+      catalog.candidates("normal", "animation").some((m) => m.id === stored.rows[0].target_id),
+    ).toBe(true);
+  });
+  it("issues an HttpOnly cookie, resumes progress and gives every visitor the same daily target", async () => {
+    const fresh = await fetch(`${base}/daily`);
+    expect(fresh.headers.get("set-cookie")).toMatch(/HttpOnly; SameSite=Lax/);
+    const c1 = cookie(),
+      c2 = cookie();
+    const first = await request("/daily", c1);
+    const second = await request("/daily", c2);
+    expect(first.data).not.toHaveProperty("answer");
+    expect(JSON.stringify(first.data)).not.toContain("target");
+    expect(first.data.id).not.toBe(second.data.id);
+    const rows = (
+      await pool.query("SELECT DISTINCT target_id FROM game_session WHERE id=ANY($1::uuid[])", [
+        [first.data.id, second.data.id],
+      ])
+    ).rows;
+    expect(rows).toHaveLength(1);
+    const wrong = catalog.movies.find((m) => m.id !== rows[0].target_id);
+    if (!wrong) throw new Error("No wrong guess");
+    const guess = await request(
+      "/daily/guess",
+      c1,
+      { movieId: wrong.id },
+      { "If-Match": `"${first.data.id}"` },
+    );
+    expect(guess.r.status).toBe(200);
+    expect(guess.data).not.toHaveProperty("answer");
+    expect(guess.data.guesses).toHaveLength(1);
+    const resumed = await request("/daily", c1);
+    expect(resumed.data.guesses).toHaveLength(1);
+    expect(resumed.data.date).toBe(utcDate());
+    const stale = await request(
+      "/daily/guess",
+      c1,
+      { movieId: wrong.id },
+      { "If-Match": `"${randomUUID()}"` },
+    );
+    expect(stale.r.status).toBe(409);
+  });
+  it("creates opaque challenges, reveals only on victory and isolates different visitors", async () => {
+    const target = catalog.movies[0];
+    const creator = cookie(),
+      player = cookie();
+    const created = await request("/challenges", creator, { movieId: target.id });
+    expect(created.r.status).toBe(201);
+    expect(created.data.path).not.toContain(target.id);
+    const start = await request(`/challenges/${created.data.id}`, player);
+    expect(start.data.status).toBe("playing");
+    expect(start.data).not.toHaveProperty("answer");
+    const won = await request(`/challenges/${created.data.id}/guess`, player, {
+      movieId: target.id,
+    });
+    expect(won.data.status).toBe("won");
+    expect(won.data.answer.id).toBe(target.id);
+    const later = await request(`/challenges/${created.data.id}/guess`, player, {
+      movieId: target.id,
+    });
+    expect(later.r.status).toBe(409);
+    const other = await request(`/challenges/${created.data.id}`, cookie());
+    expect(other.data.status).toBe("playing");
+    expect(other.data.guesses).toEqual([]);
+  });
+  it("serializes concurrent moves and reveals after exactly eight misses", async () => {
+    const target = catalog.movies[0],
+      visitor = cookie();
+    const created = await request("/challenges", cookie(), { movieId: target.id });
+    const path = `/challenges/${created.data.id}/guess`;
+    const wrong = catalog.movies.filter((m) => m.id !== target.id).slice(0, 9);
+    const duplicate = await Promise.all([
+      request(path, visitor, { movieId: wrong[0].id }),
+      request(path, visitor, { movieId: wrong[0].id }),
+    ]);
+    expect(duplicate.map((r) => r.r.status).sort()).toEqual([200, 409]);
+    const rest = await Promise.all(
+      wrong.slice(1, 8).map((m) => request(path, visitor, { movieId: m.id })),
+    );
+    expect(rest.every((r) => r.r.status === 200)).toBe(true);
+    const finished = await request(`/challenges/${created.data.id}`, visitor);
+    expect(finished.data.status).toBe("lost");
+    expect(finished.data.guesses).toHaveLength(8);
+    expect(finished.data.answer.id).toBe(target.id);
+    const ninth = await request(path, visitor, { movieId: wrong[8].id });
+    expect(ninth.r.status).toBe(409);
+  });
+  it("uses ownership for unlimited, excludes recent targets and accepts difficulty and packs", async () => {
+    const visitor = cookie();
+    const first = await request("/unlimited", visitor, { difficulty: "easy", pack: "popular" });
+    expect(first.r.status).toBe(201);
+    expect(first.data).not.toHaveProperty("answer");
+    const second = await request("/unlimited", visitor, { difficulty: "hard", pack: "popular" });
+    const targets = await pool.query(
+      "SELECT target_id FROM game_session WHERE id=ANY($1::uuid[])",
+      [[first.data.id, second.data.id]],
+    );
+    expect(new Set(targets.rows.map((r) => r.target_id)).size).toBe(2);
+    expect((await request(`/unlimited/${first.data.id}`, cookie())).r.status).toBe(404);
+    expect((await request(`/unlimited/${first.data.id}`, visitor)).r.status).toBe(200);
+    expect((await request("/unlimited", visitor, { pack: "unknown" })).r.status).toBe(422);
+  });
+  it("rejects invalid input, forged attributes, cross-origin mutations and unknown routes", async () => {
+    const c = cookie();
+    expect((await request("/challenges", c, { movieId: "x", targetId: "forged" })).r.status).toBe(
+      400,
+    );
+    expect((await request("/challenges", c, { movieId: "not-in-catalog" })).r.status).toBe(422);
+    expect((await request("/challenges/not-a-uuid", c)).r.status).toBe(400);
+    expect((await request("/unlimited", c, {}, { Origin: "https://evil.example" })).r.status).toBe(
+      403,
+    );
+    expect((await request("/missing", c)).r.status).toBe(404);
+  });
+  it("searches localized titles without returning hidden attributes", async () => {
+    const m = catalog.movies.find((m) => m.titles.ru && m.titles.ru.length > 4);
+    if (!m) throw new Error("Missing Russian fixture");
+    const result = await request(`/movies/search?q=${encodeURIComponent(m.titles.ru)}`, cookie());
+    expect(result.data.movies.map((m: { id: string }) => m.id)).toContain(m.id);
+    expect(result.data.movies[0]).not.toHaveProperty("actors");
+    expect((await request(`/movies/search?q=${"x".repeat(161)}`, cookie())).r.status).toBe(400);
+  });
+  it("rejects yesterday sessions inside the engine", async () => {
+    const visitor = randomUUID();
+    const date = "2000-01-01";
+    const target = catalog.movies[0];
+    const puzzle = (
+      await pool.query(
+        "INSERT INTO daily_puzzle(puzzle_date,target_id) VALUES($1,$2) ON CONFLICT(puzzle_date) DO UPDATE SET target_id=EXCLUDED.target_id RETURNING id",
+        [date, target.id],
+      )
+    ).rows[0];
+    const session = (
+      await pool.query(
+        "INSERT INTO game_session(visitor_id,mode,puzzle_id,target_id) VALUES($1,'daily',$2,$3) RETURNING id",
+        [visitor, puzzle.id, target.id],
+      )
+    ).rows[0];
+    await expect(
+      new Games(catalog, "secret").guess(session.id, visitor, target.id),
+    ).rejects.toMatchObject({ status: 409, code: "daily_expired" });
+    await expect(
+      new Games(catalog, "secret").hint(session.id, visitor, "actor"),
+    ).rejects.toMatchObject({ status: 409, code: "daily_expired" });
+  });
+  it("unlocks hints after three and seven misses, serializes spending and persists only chosen clues", async () => {
+    const target = catalog.movies[0],
+      player = cookie();
+    const created = await request("/challenges", cookie(), { movieId: target.id });
+    const endpoint = `/challenges/${created.data.id}`;
+    const start = await request(endpoint, player);
+    const id = start.data.id;
+    expect(start.data.hints).toMatchObject({ unlocked: 0, remaining: 0, used: [] });
+    expect((await request(`/games/${id}/hints`, player, { kind: "actor" })).data.error).toBe(
+      "hints_locked",
+    );
+    expect((await request(`/games/${id}/hints`, cookie(), { kind: "actor" })).r.status).toBe(404);
+    expect((await request(`/games/${id}/hints`, player, { kind: "answer" })).r.status).toBe(400);
+    const wrong = catalog.movies.filter((m) => m.id !== target.id).slice(0, 8);
+    for (const m of wrong.slice(0, 2))
+      await request(`${endpoint}/guess`, player, { movieId: m.id });
+    expect((await request(`/games/${id}/hints`, player, { kind: "decade" })).r.status).toBe(409);
+    const third = await request(`${endpoint}/guess`, player, { movieId: wrong[2].id });
+    expect(third.data.hints).toMatchObject({ unlocked: 1, remaining: 1, used: [] });
+    expect(third.data).not.toHaveProperty("answer");
+    const competing = await Promise.all(
+      ["actor", "decade"].map((kind) => request(`/games/${id}/hints`, player, { kind })),
+    );
+    expect(competing.map((r) => r.r.status).sort()).toEqual([200, 409]);
+    const first = (await request(endpoint, player)).data;
+    expect(first.hints.used).toHaveLength(1);
+    expect(first.hints.remaining).toBe(0);
+    expect(first).not.toHaveProperty("answer");
+    for (const m of wrong.slice(3, 7))
+      await request(`${endpoint}/guess`, player, { movieId: m.id });
+    const seventh = (await request(endpoint, player)).data;
+    expect(seventh.hints).toMatchObject({ unlocked: 2, remaining: 1 });
+    const second = await request(`/games/${id}/hints`, player, { kind: "genres" });
+    expect(second.r.status).toBe(200);
+    expect(second.data.hints.used).toHaveLength(2);
+    expect(second.data.hints.remaining).toBe(0);
+    expect(second.data).not.toHaveProperty("answer");
+    expect((await request(`/games/${id}/hints`, player, { kind: "genres" })).data.error).toBe(
+      "hint_used",
+    );
+    expect((await request(endpoint, player)).data.hints.used).toEqual(second.data.hints.used);
+    await request(`${endpoint}/guess`, player, { movieId: wrong[7].id });
+    expect((await request(`/games/${id}/hints`, player, { kind: "decade" })).data.error).toBe(
+      "game_finished",
+    );
+  });
+  it("carries an unused hint to seven misses and excludes the answer from director filmography", async () => {
+    const target = catalog.movies.find((m) =>
+      catalog.movies.some(
+        (other) =>
+          other.id !== m.id && other.directors.some((p) => m.directors.some((d) => d.id === p.id)),
+      ),
+    );
+    if (!target) throw new Error("No connected director fixture");
+    const player = cookie();
+    const created = await request("/challenges", cookie(), { movieId: target.id });
+    const endpoint = `/challenges/${created.data.id}`;
+    const start = await request(endpoint, player);
+    const id = start.data.id;
+    for (const m of catalog.movies.filter((m) => m.id !== target.id).slice(0, 7))
+      await request(`${endpoint}/guess`, player, { movieId: m.id });
+    expect((await request(endpoint, player)).data.hints.remaining).toBe(2);
+    const filmography = await request(`/games/${id}/hints`, player, { kind: "filmography" });
+    expect(filmography.r.status).toBe(200);
+    expect(
+      filmography.data.hints.used[0].movies.every((m: { id: string }) => m.id !== target.id),
+    ).toBe(true);
+    const final = await request(`/games/${id}/hints`, player, { kind: "decade" });
+    expect(final.data.hints.remaining).toBe(0);
+    expect(final.data.hints.used).toHaveLength(2);
+    expect((await request(`/games/${id}/hints`, player, { kind: "actor" })).r.status).toBe(409);
+  });
+  it.each(["daily", "unlimited"] as const)(
+    "supports persistent hints in %s games",
+    async (mode) => {
+      const player = cookie();
+      const start =
+        mode === "daily"
+          ? await request("/daily", player)
+          : await request("/unlimited", player, {});
+      const target = (
+        await pool.query("SELECT target_id FROM game_session WHERE id=$1", [start.data.id])
+      ).rows[0].target_id;
+      const endpoint = mode === "daily" ? "/daily" : `/unlimited/${start.data.id}`;
+      for (const m of catalog.movies.filter((m) => m.id !== target).slice(0, 3))
+        await request(
+          `${endpoint}/guess`,
+          player,
+          { movieId: m.id },
+          { "If-Match": `"${start.data.id}"` },
+        );
+      const result = await request(`/games/${start.data.id}/hints`, player, { kind: "actor" });
+      expect(result.r.status).toBe(200);
+      expect(result.data).not.toHaveProperty("answer");
+      expect(result.data.hints.used).toHaveLength(1);
+      expect((await request(endpoint, player)).data.hints.used).toEqual(result.data.hints.used);
+    },
+  );
+  it("does not unlock a third-attempt hint on victory after two misses", async () => {
+    const target = catalog.movies[0],
+      player = cookie();
+    const created = await request("/challenges", cookie(), { movieId: target.id });
+    const endpoint = `/challenges/${created.data.id}`;
+    for (const m of catalog.movies.filter((m) => m.id !== target.id).slice(0, 2))
+      await request(`${endpoint}/guess`, player, { movieId: m.id });
+    const won = await request(`${endpoint}/guess`, player, { movieId: target.id });
+    expect(won.data.status).toBe("won");
+    expect(won.data.hints).toMatchObject({ unlocked: 0, remaining: 0, used: [] });
+  });
+  it("keeps existing game and Daily targets stable across catalog corrections", async () => {
+    const player = randomUUID();
+    const games = new Games(catalog, "test-secret-at-least-32-characters");
+    const game = await games.unlimited(player, "normal", "popular");
+    const stored = (
+      await pool.query("SELECT target_id,target_snapshot FROM game_session WHERE id=$1", [game.id])
+    ).rows[0];
+    const target = catalog.byId.get(stored.target_id);
+    if (!target) throw new Error("Missing target");
+    const corrected = new Catalog(
+      catalog.movies.map((m) =>
+        m.id === target.id
+          ? { ...m, actors: [{ id: "corrected-actor", name: "New credit", names: {} }] }
+          : m,
+      ),
+      catalog.packs,
+    );
+    const after = new Games(corrected, "test-secret-at-least-32-characters");
+    const won = await after.guess(game.id, player, target.id);
+    expect(won.answer?.actors).toEqual(target.actors);
+    expect(won.guesses[0].comparison.actors.status).toBe("exact");
+    const oldDaily = await games.daily(player);
+    const dailyRow = (
+      await pool.query("SELECT target_id FROM game_session WHERE id=$1", [oldDaily.id])
+    ).rows[0];
+    const altered = new Catalog(
+      catalog.movies.map((m) =>
+        m.id === dailyRow.target_id ? { ...m, runtime: m.runtime + 50 } : m,
+      ),
+      catalog.packs,
+    );
+    const freshPlayer = randomUUID();
+    const newDaily = await new Games(altered, "test-secret-at-least-32-characters").daily(
+      freshPlayer,
+    );
+    const result = await new Games(altered, "test-secret-at-least-32-characters").guess(
+      newDaily.id,
+      freshPlayer,
+      dailyRow.target_id,
+    );
+    expect(result.answer?.runtime).toBe(catalog.byId.get(dailyRow.target_id)?.runtime);
+  });
+  it("backfills legacy targets before the correcting seed and keeps recorded clues", async () => {
+    const target = catalog.movies[0];
+    await pool.query("UPDATE movie SET runtime=runtime+5 WHERE id=$1", [target.id]);
+    const legacyCatalog = await loadCatalog();
+    const visitor = randomUUID();
+    const challenge = (
+      await pool.query("INSERT INTO challenge(target_id) VALUES($1) RETURNING id", [target.id])
+    ).rows[0];
+    const legacyGames = new Games(legacyCatalog, "secret");
+    const game = await legacyGames.challenge(challenge.id, visitor);
+    await pool.query("UPDATE game_session SET target_snapshot=NULL WHERE id=$1", [game.id]);
+    const wrong = legacyCatalog.movies.find((m) => m.id !== target.id);
+    if (!wrong) throw new Error("No wrong film");
+    const before = await legacyGames.guess(game.id, visitor, wrong.id);
+    const run = promisify(execFile);
+    await run(process.execPath, ["scripts/import_movies/seed.ts"], {
+      env: process.env,
+      maxBuffer: 1024 * 1024,
+    });
+    const updated = await loadCatalog();
+    expect(updated.byId.get(target.id)?.runtime).toBe(target.runtime);
+    const won = await new Games(updated, "secret").guess(game.id, visitor, target.id);
+    expect(won.answer?.runtime).toBe(target.runtime + 5);
+    expect(won.guesses[0]).toEqual(before.guesses[0]);
+    expect(won.guesses[1].comparison.runtime.status).toBe("exact");
+  }, 240000);
+  it("rate limits public mutations in PostgreSQL", async () => {
+    const limited = app(catalog, "secret", { rateLimit: 0 });
+    limited.listen(0, "127.0.0.1");
+    await once(limited, "listening");
+    const a = limited.address();
+    if (!a || typeof a === "string") throw new Error("No port");
+    try {
+      const r = await fetch(`http://127.0.0.1:${a.port}/api/unlimited`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}",
+      });
+      expect(r.status).toBe(429);
+      expect(r.headers.get("retry-after")).toBe("60");
+    } finally {
+      await new Promise<void>((resolve) => limited.close(() => resolve()));
+    }
+  });
+});

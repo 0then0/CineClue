@@ -1,0 +1,2354 @@
+{
+  "retrievedAt": "2026-10-21",
+  "candidateCount": 12776,
+  "existingPreserved": 1141,
+  "creditedCastEnriched": 1141,
+  "existingMatched": 1141,
+  "completeNew": 11089,
+  "providerMissing": [],
+  "selected": 10000,
+  "added": 8859,
+  "countries": 118,
+  "addedRussianLanguage": 302,
+  "years": [
+    1915,
+    2026
+  ],
+  "mappedIdentifiers": 4548,
+  "ambiguousMappingsExcluded": [
+    "tmdb:studio:1020"
+  ],
+  "rejections": [
+    {
+      "id": 823219,
+      "reason": "actors: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 403587,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 775,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 251516,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 326359,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 140420,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 152747,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 399106,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 724089,
+      "reason": "countries: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 43641,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 923939,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 460793,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 722913,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 626,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 485774,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 13930,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 514754,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 836466,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 13929,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 531,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 256835,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 320367,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 13377,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 286192,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 638507,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 24480,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 82881,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 355338,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 13042,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 682110,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 306952,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 213121,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 662,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 530,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 455661,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 13932,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 713776,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 14813,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 379862,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 532,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 40619,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 211387,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 32085,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 6418,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 13394,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 293299,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 83564,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 13060,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 13413,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 26317,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 13187,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 92060,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 13931,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 995133,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 197082,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 993,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 77887,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 79218,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 5698,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 14002,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 876716,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 846214,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 246355,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 13925,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 644090,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 76122,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 253980,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 823754,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 119569,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 834860,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 357953,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1172676,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 14447,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 13928,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 464446,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 53565,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 13933,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 82424,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 13062,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 76535,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 413279,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 200481,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 38594,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 803,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1172675,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 552095,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 416494,
+      "reason": "countries: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 1172674,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 839321,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 11848,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 62320,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 741074,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 828508,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1188150,
+      "reason": "countries: Too small: expected array to have >=1 items; actors: Too small: expected array to have >=1 items; studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 558144,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 528491,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 160,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 130925,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 11049,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 83201,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 508933,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 56831,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 787428,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 282297,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 48466,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 387893,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 484510,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 13927,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 43629,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 811367,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 589739,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 610120,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 618353,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 13934,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 140870,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 15854,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 507143,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 253310,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 13353,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 20722,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 203101,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 664280,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 1076364,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 120475,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 24589,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 475946,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1412113,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 33914,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 27040,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 15265,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1040330,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 400608,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 1139087,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 91417,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 877183,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 367412,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 433471,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 34463,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 652722,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 473072,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 574074,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 348877,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 813258,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 13675,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 13061,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 259761,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 10258,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1091834,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 164052,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 963765,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 624932,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 50393,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 831827,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 116440,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 253835,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 298115,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1010818,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 475759,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 489412,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 774,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 392011,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 973164,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 441829,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 36208,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 21943,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 303867,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 13926,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 673595,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 15251,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 13396,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 48714,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 18917,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 36129,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 38577,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 36161,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 29266,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 72215,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 36079,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 42279,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 36163,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 33065,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 36162,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 90056,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 77294,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 79701,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 33108,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 77304,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1011816,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 33534,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 48775,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 72203,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 52939,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 77759,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 77762,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 145760,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 34859,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 57780,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 44361,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 483855,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 71051,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 160046,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 70061,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1143723,
+      "reason": "actors: Too small: expected array to have >=1 items; studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 438597,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 329063,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 119855,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 20879,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 37176,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 72199,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 41979,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 129229,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 51349,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 90001,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 329013,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 85035,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 947890,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 91142,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 72892,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 104522,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 72204,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 65591,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 198988,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 79702,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 77557,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 203046,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 306742,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 314946,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 333372,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 168478,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 79703,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 71393,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 273202,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 51892,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 480284,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 165095,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 44357,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 273126,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 531278,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1082415,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 422058,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 584855,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 144611,
+      "reason": "actors: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 47703,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 91653,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 140966,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 118794,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 89905,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 45176,
+      "reason": "actors: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 39170,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 213299,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 149117,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 84816,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 213321,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 118792,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 435041,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 79853,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 861396,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 716316,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 618389,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 555435,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 273961,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 129739,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 606882,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 575356,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 193216,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 90277,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 84774,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1327965,
+      "reason": "actors: Too small: expected array to have >=1 items; studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 90008,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 109535,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 72205,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 448879,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 195083,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 90327,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 69899,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 65594,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 50186,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 91673,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 90045,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 419946,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 214157,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 168202,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 746080,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 405388,
+      "reason": "countries: Too small: expected array to have >=1 items; studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 72208,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 48605,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 48520,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 643397,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 438086,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 295855,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 185579,
+      "reason": "actors: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 90421,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 778970,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 337389,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 160425,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 248556,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 147198,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 139231,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 570595,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 210861,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 198916,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 195075,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 176407,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 105743,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 95814,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 83789,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 57757,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 814791,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 469450,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 412841,
+      "reason": "countries: Too small: expected array to have >=1 items; studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 147009,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 79216,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1275232,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 454655,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 339438,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 220949,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 215400,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 194148,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 183728,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 145808,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1010821,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 2791,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 779047,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 28118,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 594530,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 37910,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 13924,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 88018,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 532953,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 258152,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 25472,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 747059,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 64956,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 89636,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 406785,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 54551,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 86130,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 13479,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 53985,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 574093,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 15257,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 43650,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 25523,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 35114,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 47626,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1010819,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1010820,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 98622,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1010823,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 546728,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 81003,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 234567,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 345637,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 57718,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 31135,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 25565,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 79443,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 161143,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 42979,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 366141,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 298016,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 44239,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 53210,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 58508,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 462650,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 483306,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 563710,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 381693,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 25831,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 229407,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 19354,
+      "reason": "actors: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 32536,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 583055,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1371727,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 303451,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 16440,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 649928,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 408355,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 72640,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 47166,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 17963,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 297610,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 48784,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 706860,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 53217,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 46247,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 76420,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 574089,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 825597,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 54559,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 53215,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 528644,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 79379,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 58159,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 67572,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 403052,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1015602,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 21131,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 106112,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 54553,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 379779,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 38580,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 18143,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 229408,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 10378,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 791348,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 48617,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 46718,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 896221,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 24358,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 32389,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 53219,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 51256,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 24357,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 459159,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 418956,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 44510,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 421281,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 24362,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 785545,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 67661,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 41988,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 818350,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 182131,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 24914,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 532952,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 53211,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 49565,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 770922,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 67409,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 67167,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 36107,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 141423,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 52971,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1046032,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 3171,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 33600,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 45745,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 39853,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 72962,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 7092,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 32428,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 25078,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 19035,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 127144,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 79082,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 145316,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 574091,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 743439,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 55692,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 52954,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 300424,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 18846,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1329336,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 805411,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 70608,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 637663,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 287663,
+      "reason": "countries: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 56619,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 288737,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 81684,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 368304,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 124277,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 24328,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 38180,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 24950,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 66834,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 26809,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 24660,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 85221,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 61080,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 67713,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 549484,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 229405,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 222715,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 100246,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 42982,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 234862,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 142563,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 764079,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 141528,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 24675,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 44338,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 31160,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 24960,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 53222,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 24959,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 38060,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1230393,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 787561,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 53220,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 26840,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 367326,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 23282,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 47653,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 82120,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 256,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 16463,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 104700,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 2929,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 38742,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 292141,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 42536,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 44892,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 133063,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 2963,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 53423,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 6166,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 49296,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 31681,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 36324,
+      "reason": "studios: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 47650,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 51360,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 49279,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 45966,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 91,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 51357,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 122134,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 53429,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 51358,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 22885,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 44065,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 31819,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 46787,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 41212,
+      "reason": "actors: Too small: expected array to have >=1 items"
+    },
+    {
+      "id": 2077,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 94570,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 51359,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 44473,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 47831,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 81399,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 51362,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 37103,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 53420,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 45970,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 315946,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 96035,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 104480,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 57472,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 30982,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 64711,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 54184,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 38705,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1755291,
+      "reason": "incomplete_cast"
+    },
+    {
+      "id": 1497463,
+      "reason": "runtime_out_of_range"
+    },
+    {
+      "id": 1548113,
+      "reason": "runtime_out_of_range"
+    }
+  ],
+  "packs": {
+    "popular": {
+      "easy": 4939,
+      "normal": 9288,
+      "hard": 9803
+    },
+    "animation": {
+      "easy": 411,
+      "normal": 709,
+      "hard": 772
+    },
+    "action": {
+      "easy": 1441,
+      "normal": 2284,
+      "hard": 2348
+    },
+    "adventure": {
+      "easy": 974,
+      "normal": 1500,
+      "hard": 1568
+    },
+    "comedy": {
+      "easy": 1708,
+      "normal": 3375,
+      "hard": 3506
+    },
+    "drama": {
+      "easy": 2098,
+      "normal": 4159,
+      "hard": 4408
+    },
+    "scifi": {
+      "easy": 767,
+      "normal": 1212,
+      "hard": 1267
+    },
+    "fantasy": {
+      "easy": 715,
+      "normal": 1119,
+      "hard": 1188
+    },
+    "horror": {
+      "easy": 678,
+      "normal": 1329,
+      "hard": 1475
+    },
+    "thriller": {
+      "easy": 1419,
+      "normal": 2547,
+      "hard": 2649
+    },
+    "crime": {
+      "easy": 847,
+      "normal": 1519,
+      "hard": 1569
+    },
+    "mystery": {
+      "easy": 495,
+      "normal": 868,
+      "hard": 917
+    },
+    "romance": {
+      "easy": 778,
+      "normal": 1574,
+      "hard": 1642
+    },
+    "superheroes": {
+      "easy": 71,
+      "normal": 71,
+      "hard": 71
+    },
+    "musicals": {
+      "easy": 94,
+      "normal": 100,
+      "hard": 101
+    },
+    "war": {
+      "easy": 164,
+      "normal": 319,
+      "hard": 348
+    },
+    "classics": {
+      "easy": 183,
+      "normal": 503,
+      "hard": 573
+    },
+    "seventies": {
+      "easy": 130,
+      "normal": 315,
+      "hard": 330
+    },
+    "eighties": {
+      "easy": 303,
+      "normal": 618,
+      "hard": 653
+    },
+    "nineties": {
+      "easy": 603,
+      "normal": 1091,
+      "hard": 1107
+    },
+    "noughties": {
+      "easy": 1213,
+      "normal": 2086,
+      "hard": 2152
+    },
+    "tens": {
+      "easy": 1782,
+      "normal": 3186,
+      "hard": 3375
+    },
+    "modern": {
+      "easy": 725,
+      "normal": 1489,
+      "hard": 1613
+    },
+    "nolan": {
+      "easy": 13,
+      "normal": 13,
+      "hard": 13
+    },
+    "spielberg": {
+      "easy": 33,
+      "normal": 36,
+      "hard": 36
+    },
+    "tarantino": {
+      "easy": 13,
+      "normal": 13,
+      "hard": 13
+    },
+    "hitchcock": {
+      "easy": 20,
+      "normal": 32,
+      "hard": 32
+    },
+    "scorsese": {
+      "easy": 21,
+      "normal": 25,
+      "hard": 25
+    },
+    "miyazaki": {
+      "easy": 12,
+      "normal": 12,
+      "hard": 12
+    }
+  }
+}

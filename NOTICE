@@ -1,0 +1,12 @@
+CineClue
+Copyright 2026 CineClue contributors
+
+Original application code, documentation and CineClue SVG icon: Apache License 2.0.
+Bundled Wikidata structured film facts: CC0 1.0, separately attributed in data/README.md
+and per-film provenance. Film media is fetched on demand and carries per-image attribution and license links.
+The documentation screenshot contains TMDB-supplied posters and portraits listed in
+docs/screenshot-credits.md; these images retain their respective owners' rights.
+The unmodified TMDB attribution logo in apps/web/public/tmdb.svg comes from
+https://www.themoviedb.org/about/logos-attribution and retains TMDB branding terms.
+The bundled expanded catalog includes separately attributed TMDB metadata. It remains
+subject to TMDB's own terms and is not covered by the code or Wikidata license.
