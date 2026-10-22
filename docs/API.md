@@ -35,7 +35,7 @@ Closing a chooser does not spend a use. A kind with insufficient source data is 
 
 - `GET /movies/search?q=...` returns `{ "movies": [...] }` with up to ten public film references. Queries contain 2–160 characters.
 - `GET /packs` returns localized collections, eligible counts by `easy`/`normal`/`hard`, catalog size and data-source identifiers. A collection's `count` is its hard-difficulty target count. Counts describe playable targets rather than all searchable films.
-- `GET /media/{movie_id}` returns optional poster/portrait metadata and country ISO codes for a known film. Provider credentials are never included.
+- `GET /media/{movie_id}` returns optional poster, portrait and studio-logo metadata (keyed by canonical entity ID), plus country ISO codes for a known film. Provider credentials are never included.
 - `GET /health` checks database connectivity and reports catalog size.
 
 ## Session responses

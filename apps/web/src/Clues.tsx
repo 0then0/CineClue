@@ -7,7 +7,7 @@ import type {
   SetResult,
 } from "../../../packages/game-engine/src/model.ts";
 import { type Locale, type Messages, titleOf } from "./i18n.ts";
-import { flag, MediaCredits, MediaPicture, useMovieMedia } from "./Media.tsx";
+import { flag, MediaCredits, MediaPicture, StudioLogo, useMovieMedia } from "./Media.tsx";
 import { clueKeys } from "./results.ts";
 
 type ClueKey = (typeof clueKeys)[number];
@@ -30,7 +30,7 @@ function EntityValue({
   const person = kind === "directors" || kind === "actors";
   return (
     <span
-      className={`entity-token ${person ? "person-token" : ""} ${matched ? "matched" : ""}`}
+      className={`entity-token ${person ? "person-token" : kind === "studios" ? "studio-token" : ""} ${matched ? "matched" : ""}`}
       title={name}
     >
       {person && (
@@ -62,6 +62,12 @@ function EntityValue({
           {flag(media.countries[entity.id] ?? entity.id.match(/^iso:([A-Z]{2})$/)?.[1])}
         </span>
       )}
+      {kind === "studios" && (
+        <StudioLogo
+          key={media.studios?.[entity.id]?.url ?? entity.id}
+          image={media.studios?.[entity.id]}
+        />
+      )}
       <span className="entity-name">{name}</span>
     </span>
   );
@@ -90,9 +96,7 @@ function Clue({
           Number(value.matches.some((m) => m.id === b.id)) -
           Number(value.matches.some((m) => m.id === a.id)),
       );
-  const more =
-    !people &&
-    (values.length > limit || values.some((v) => (v.names[locale] ?? v.name).length > 24));
+  const more = values.length > limit;
   const entity = (e: Entity) => (
     <EntityValue
       key={e.id}
@@ -130,11 +134,9 @@ function Clue({
           {more && (
             <details className="clue-more">
               <summary aria-label={`${t.showAll}: ${t[kind]}`}>
-                {values.length > limit ? `+${values.length - limit}` : t.showAll}
+                {`+${values.length - limit}`}
               </summary>
-              <div className="entity-list expanded-entities">
-                {(kind === "genres" ? values.slice(limit) : values).map(entity)}
-              </div>
+              <div className="entity-list expanded-entities">{values.slice(limit).map(entity)}</div>
             </details>
           )}
         </>

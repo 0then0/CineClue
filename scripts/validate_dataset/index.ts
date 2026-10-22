@@ -29,6 +29,9 @@ const images = await readMediaSnapshot();
 for (const [id, media] of Object.entries(images)) {
   const movie = catalog.byId.get(id);
   if (!movie) throw new Error(`Unknown media film ${id}`);
+  for (const studio of Object.keys(media.studios ?? {}))
+    if (!movie.studios.some((s) => s.id === studio))
+      throw new Error(`Unknown studio logo ${studio} in ${id}`);
   const people = new Set([...movie.actors, ...movie.directors].map((p) => p.id));
   for (const person of Object.keys(media.people))
     if (!people.has(person)) throw new Error(`Unknown portrait ${person} in ${id}`);

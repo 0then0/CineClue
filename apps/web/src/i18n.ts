@@ -1,6 +1,5 @@
 export type Locale = "en" | "ru";
 const en = {
-  tagline: "A daily film deduction",
   daily: "Daily",
   unlimited: "Unlimited",
   challenge: "Challenge",
@@ -56,7 +55,6 @@ const en = {
   hint_used: "This hint has already been used.",
   hint_unavailable: "This category has no available data. Choose another hint.",
 
-  eyebrow: "FOLLOW THE CONNECTIONS",
   headline: "Every guess tells a story.",
   intro: "One mystery film. Eight guesses. Find the connections and follow the clues.",
   today: "Today’s mystery",
@@ -103,8 +101,7 @@ const en = {
   eraCollections: "Decades & eras",
   directorCollections: "Directors",
   challengeTitle: "Set a mystery for a friend.",
-  challengeIntro:
-    "Choose a film, then share the private challenge link. The URL never contains the answer.",
+  challengeIntro: "Choose a film, then share the private challenge link.",
   challengeReady: "Your challenge is ready.",
   copy: "Copy link",
   copied: "Link copied",
@@ -124,7 +121,6 @@ const en = {
   system: "System theme",
   light: "Light theme",
   dark: "Dark theme",
-  footer: "Built for curious film minds.",
   openData: "Film facts from Wikidata · CC0",
   mixedData: "Film facts: Wikidata (CC0) and TMDB (TMDB terms)",
   retry: "Try again",
@@ -143,7 +139,6 @@ const en = {
   shareUnavailable: "Sharing is unavailable. You can copy the result below.",
 } as const;
 const ru: Record<keyof typeof en, string> = {
-  tagline: "Ежедневная кинодедукция",
   daily: "Фильм дня",
   unlimited: "Без границ",
   challenge: "Вызов",
@@ -200,7 +195,6 @@ const ru: Record<keyof typeof en, string> = {
   hint_used: "Эта подсказка уже использована.",
   hint_unavailable: "Для этой категории нет данных. Выберите другую подсказку.",
 
-  eyebrow: "ИЩИТЕ СВЯЗИ",
   headline: "Каждый ход раскрывает сюжет.",
   intro: "Один загаданный фильм. Восемь попыток. Находите связи и следуйте подсказкам.",
   today: "Сегодняшняя загадка",
@@ -246,7 +240,7 @@ const ru: Record<keyof typeof en, string> = {
   eraCollections: "Десятилетия и эпохи",
   directorCollections: "Режиссёры",
   challengeTitle: "Загадайте фильм другу.",
-  challengeIntro: "Выберите фильм и поделитесь ссылкой на вызов. Ответа в URL нет.",
+  challengeIntro: "Выберите фильм и поделитесь ссылкой на вызов.",
   challengeReady: "Вызов готов.",
   copy: "Скопировать ссылку",
   copied: "Ссылка скопирована",
@@ -266,7 +260,6 @@ const ru: Record<keyof typeof en, string> = {
   system: "Системная тема",
   light: "Светлая тема",
   dark: "Тёмная тема",
-  footer: "Для тех, кто любит искать связи в кино.",
   openData: "Факты о фильмах: Wikidata · CC0",
   mixedData: "Данные: Wikidata (CC0) и TMDB (условия TMDB)",
   retry: "Повторить",

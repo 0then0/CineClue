@@ -3,9 +3,21 @@
 <h1 align="center">CineClue</h1>
 <p align="center">A daily film deduction game.</p>
 
+<p align="center">
+  <a href="https://github.com/0then0/CineClue/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/0then0/CineClue/ci.yml?branch=main&label=CI" alt="CI status"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="License: Apache-2.0"></a>
+  <a href="package.json"><img src="https://img.shields.io/badge/TypeScript-7.0.2-3178C6?logo=typescript&logoColor=white" alt="TypeScript 7.0.2"></a>
+  <a href="apps/web/package.json"><img src="https://img.shields.io/badge/React-19.3.1-149ECA?logo=react&logoColor=white" alt="React 19.3.1"></a>
+  <a href="package.json"><img src="https://img.shields.io/badge/Node.js-24.x-339933?logo=nodedotjs&logoColor=white" alt="Node.js 24.x"></a>
+  <a href="pnpm-lock.yaml"><img src="https://img.shields.io/badge/pnpm-12.14.0-F69220?logo=pnpm&logoColor=white" alt="pnpm 12.14.0"></a>
+  <a href="docs/DEPLOYMENT.md"><img src="https://img.shields.io/badge/PostgreSQL-16%E2%80%9318-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL 16–18"></a>
+</p>
+
+<p align="center"><strong>English</strong> · <a href="README.ru.md">Русский</a></p>
+
 Guess a mystery film through its connections to other movies. Each attempt compares the release year, director, genres, cast, runtime, countries and studios. Everyone gets the same Daily puzzle, with eight attempts to solve it.
 
-![CineClue in English: film comparisons with posters, cast portraits and match indicators](docs/screenshot.jpg)
+![CineClue in English: film comparisons with posters, cast portraits, studio logos and match indicators](docs/screenshot.jpg)
 
 ## Features
 

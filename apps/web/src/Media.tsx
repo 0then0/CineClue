@@ -56,6 +56,24 @@ export function MediaPicture({
     </span>
   );
 }
+export function StudioLogo({ image }: { image?: MediaImage }) {
+  const [failed, setFailed] = useState(false);
+  if (!image || failed) return null;
+  return (
+    <span className="studio-logo" aria-hidden="true">
+      <img
+        key={image.url}
+        src={image.url}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        referrerPolicy="no-referrer"
+        onError={() => setFailed(true)}
+      />
+    </span>
+  );
+}
+
 export function flag(iso?: string) {
   return iso && /^[A-Z]{2}$/.test(iso) && !["SU", "DD", "CS", "YU"].includes(iso)
     ? String.fromCodePoint(...[...iso].map((c) => 127397 + c.charCodeAt(0)))
@@ -64,7 +82,7 @@ export function flag(iso?: string) {
 export function MediaCredits({ media, t }: { media: MovieMedia; t: Messages }) {
   const images = [
     ...new Map(
-      [media.poster, ...Object.values(media.people)]
+      [media.poster, ...Object.values(media.people), ...Object.values(media.studios ?? {})]
         .filter((v): v is MediaImage => !!v)
         .map((image) => [image.source, image]),
     ).values(),

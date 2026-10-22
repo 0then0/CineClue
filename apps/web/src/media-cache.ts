@@ -2,7 +2,7 @@ import { z } from "zod";
 import { type MovieMedia, movieMediaSchema } from "../../../packages/game-engine/src/model.ts";
 import { readStorage, writeStorage } from "./client.ts";
 
-const key = "cineclue:media:v2";
+const key = "cineclue:media:v4";
 const cacheSchema = z.record(
   z.string(),
   z.object({ expires: z.number().finite(), media: movieMediaSchema }),
@@ -19,7 +19,10 @@ export function cachedMovieMedia(id: string): MovieMedia | undefined {
 }
 function save(id: string, media: MovieMedia) {
   const now = Date.now();
-  const ttl = media.poster || Object.keys(media.people).length ? 86400000 : 900000;
+  const ttl =
+    media.poster || Object.keys(media.people).length || Object.keys(media.studios ?? {}).length
+      ? 86400000
+      : 900000;
   const older = Object.entries(readCache())
     .filter(([otherId, entry]) => otherId !== id && entry.expires > now)
     .slice(0, 99);
@@ -33,7 +36,7 @@ export function loadMovieMedia(id: string): Promise<MovieMedia> {
   // Shared requests outlive individual cards; unmounted subscribers ignore the result.
   const request = fetch(`/api/media/${encodeURIComponent(id)}`, {
     credentials: "same-origin",
-    cache: "default",
+    cache: "no-cache",
     signal: AbortSignal.timeout(30000),
   })
     .then(async (response) => {

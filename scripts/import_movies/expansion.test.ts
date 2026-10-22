@@ -199,6 +199,10 @@ it("publishes attributed image metadata with canonical people and country IDs", 
     {
       ...raw,
       poster_path: "/poster.jpg",
+      production_companies: [
+        { id: 10, name: "Studio", logo_path: "/logo.png" },
+        { id: 999, name: "Unrelated", logo_path: "/wrong.png" },
+      ],
       credits: {
         ...raw.credits,
         cast: raw.credits.cast.map((p) => ({ ...p, profile_path: `/${p.id}.jpg` })),
@@ -207,6 +211,8 @@ it("publishes attributed image metadata with canonical people and country IDs", 
     film,
     identities,
   );
+  expect(Object.keys(media.studios ?? {})).toEqual([film.studios[0].id]);
+  expect(media.studios?.[film.studios[0].id].source).toBe("https://www.themoviedb.org/company/10");
   expect(media.poster?.provider).toBe("tmdb");
   expect(media.people.Q1.source).toBe("https://www.themoviedb.org/person/1");
   expect(media.countries.Q30).toBe("US");

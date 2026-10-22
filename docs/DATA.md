@@ -5,7 +5,7 @@ CineClue ships a versioned catalog of 10,000 films. The game can initialize and 
 ## Catalog files
 
 - `data/catalog.json`: normalized films and collection definitions used by the database seed.
-- `data/media.json`: versioned poster/portrait URLs, country codes and source/license credits; image files are not bundled.
+- `data/media.json`: versioned poster/portrait/studio-logo URLs, country codes and source/license credits; image files are not bundled.
 - `data/catalog-report.json`: snapshot date, exclusions and playable target counts for each difficulty.
 - `data/seed/movies.json`: the separate Wikidata-only source seed.
 - `data/seed/packs.json`: collection rules and English/Russian labels.
@@ -67,6 +67,6 @@ Search covers the whole catalog. Target eligibility additionally requires comple
 
 Wikimedia Commons images require a supported license: CC BY, CC BY-SA, CC0 or public domain. Cards retain photographer, file-page and license links and disclose thumbnail cropping. Wikimedia images are not automatically CC0; see [Commons reuse requirements](https://commons.wikimedia.org/wiki/Commons:Reusing_content_outside_Wikimedia).
 
-Complete imported image metadata is served directly from `data/media.json`, so API outages and restarts do not remove available posters or portraits. Missing media can fall back to provider lookups. Provider calls have eight-second timeouts, two active lookups and a bounded queue. The server caches successful results for 24 hours and empty results for 15 minutes. Its cache resets on restart. The browser persists validated image metadata for the same periods, up to 100 films, and shares in-flight requests between cards. Reloads reuse unexpired metadata without a new media API call when browser storage is available.
+Complete imported image metadata is served directly from `data/media.json`, so API outages and restarts do not remove available posters or portraits. Missing media can fall back to provider lookups. Studio logos also use Wikidata P154 and licensed Wikimedia Commons files when TMDB has no matching logo. Canonical studio IDs share available logos across films; names are never used to guess identity. Run `pnpm data:media` after a catalog refresh to persist those fallback logos and their attribution in the snapshot. Provider calls have eight-second timeouts, two active lookups and a bounded queue. The server caches successful results for 24 hours and empty results for 15 minutes. Its cache resets on restart. The browser persists validated image metadata for the same periods, up to 100 films, and shares in-flight requests between cards. When requesting metadata, the browser revalidates the HTTP response to avoid storing an older API response after an application update. Reloads reuse unexpired metadata without a new media API call when browser storage is available.
 
 Image files use the provider CDN and browser HTTP cache. A hard reload can refetch image files even when metadata remains cached. Failed requests are not persisted, and provider outages leave names and placeholders readable.

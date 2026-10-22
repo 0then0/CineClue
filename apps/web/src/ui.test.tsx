@@ -369,3 +369,48 @@ it("preserves a Daily record saved by another tab after mount", async () => {
     ).toEqual(["2099-10-20", "2099-10-21"]),
   );
 });
+
+it("shows the selected film on challenge creation and clears it when choosing another", async () => {
+  const poster = {
+    url: "https://image.tmdb.org/t/p/w185/poster.jpg",
+    source: "https://www.themoviedb.org/movie/157336",
+    author: "TMDB contributors",
+    license: "TMDB terms",
+    licenseUrl: "https://www.themoviedb.org/terms-of-use",
+    provider: "tmdb",
+  };
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockImplementation((url: string) => {
+      const value = url.includes("/movies/search")
+        ? { movies: [publicMovie(movie)] }
+        : url.includes("/media/")
+          ? { poster, people: {}, countries: {} }
+          : url.endsWith("/challenges")
+            ? { path: "/challenge/test" }
+            : url.endsWith("/packs")
+              ? { packs: [], catalogSize: 1 }
+              : playing;
+      return Promise.resolve(new Response(JSON.stringify(value)));
+    }),
+  );
+  const user = userEvent.setup();
+  const { container } = render(<App />);
+  await screen.findByRole("combobox", { name: dictionaries.en.search });
+  await user.click(screen.getByRole("button", { name: "Challenge" }));
+  await user.type(screen.getByRole("combobox", { name: dictionaries.en.search }), "Inter");
+  await user.click(await screen.findByRole("option", { name: /Interstellar/ }));
+  expect(await screen.findByRole("heading", { name: "Your challenge is ready." })).toBeTruthy();
+  expect(screen.getByRole("heading", { name: "Interstellar", level: 3 })).toBeTruthy();
+  await waitFor(() =>
+    expect(container.querySelector(".challenge-movie .movie-poster img")?.getAttribute("src")).toBe(
+      poster.url,
+    ),
+  );
+  expect((screen.getByLabelText("Challenge") as HTMLInputElement).value).toContain(
+    "/challenge/test",
+  );
+  await user.click(screen.getByRole("button", { name: dictionaries.en.createAnother }));
+  expect(container.querySelector(".challenge-movie")).toBeNull();
+  expect(screen.getByRole("combobox", { name: dictionaries.en.search })).toBeTruthy();
+});

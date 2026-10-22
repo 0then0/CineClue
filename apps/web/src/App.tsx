@@ -10,7 +10,8 @@ import { Clues } from "./Clues.tsx";
 import { Confetti } from "./Confetti.tsx";
 import { api, HttpError, readStorage, writeStorage } from "./client.ts";
 import { Hints } from "./Hints.tsx";
-import { dictionaries, type Locale, type Messages } from "./i18n.ts";
+import { dictionaries, type Locale, type Messages, titleOf } from "./i18n.ts";
+import { MediaCredits, MediaPicture, useMovieMedia } from "./Media.tsx";
 import { readRecords, saveRecord } from "./records.ts";
 import { type DailyRecord, shareText, stats } from "./results.ts";
 import { Search } from "./Search.tsx";
@@ -29,6 +30,26 @@ const route = () => window.location.pathname;
 function errorMessage(e: unknown, t: Messages) {
   return e instanceof HttpError && e.code in t ? t[e.code as keyof Messages] : t.error;
 }
+function ChallengeMovie({ movie, locale, t }: { movie: PublicMovie; locale: Locale; t: Messages }) {
+  const media = useMovieMedia(movie.id);
+  return (
+    <article className="challenge-movie">
+      <MediaPicture
+        key={media.poster?.url ?? movie.id}
+        image={media.poster}
+        name={titleOf(movie, locale)}
+        poster
+      />
+      <div>
+        <h3>{titleOf(movie, locale)}</h3>
+        <p>{movie.releaseYear}</p>
+        {movie.originalTitle !== titleOf(movie, locale) && <p>{movie.originalTitle}</p>}
+      </div>
+      <MediaCredits media={media} t={t} />
+    </article>
+  );
+}
+
 function StatsDialog({
   records,
   t,
@@ -98,7 +119,11 @@ export default function App() {
   const [records, setRecords] = useState<DailyRecord[]>(readRecords);
   const [showStats, setShowStats] = useState(false);
   const [builder, setBuilder] = useState(false);
-  const [challengeUrl, setChallengeUrl] = useState("");
+  const [createdChallenge, setCreatedChallenge] = useState<{
+    url: string;
+    movie: PublicMovie;
+  } | null>(null);
+  const challengeUrl = createdChallenge?.url ?? "";
   const [packs, setPacks] = useState<Pack[]>([]);
   const [tmdbData, setTmdbData] = useState(false);
   const [catalogSize, setCatalogSize] = useState<number | null>(null);
@@ -264,7 +289,7 @@ export default function App() {
     setError(null);
     try {
       const value = await api<{ path: string }>("/challenges", { movieId: movie.id });
-      setChallengeUrl(`${window.location.origin}${value.path}`);
+      setCreatedChallenge({ url: `${window.location.origin}${value.path}`, movie });
     } catch (e) {
       setError(e);
       throw e;
@@ -336,9 +361,7 @@ export default function App() {
           }}
         >
           <img src="/icon.svg" width="38" height="38" alt="" />
-          <span>
-            CineClue<small>{t.tagline}</small>
-          </span>
+          <span>CineClue</span>
         </a>
         <div className="utilities">
           <button
@@ -404,7 +427,7 @@ export default function App() {
             aria-current={mode === "challenge" ? "page" : undefined}
             onClick={() => {
               setBuilder(true);
-              setChallengeUrl("");
+              setCreatedChallenge(null);
               setError(null);
               setNotice("");
             }}
@@ -414,7 +437,6 @@ export default function App() {
           </button>
         </nav>
         <section className="intro">
-          <p className="eyebrow">{t.eyebrow}</p>
           <h1>{builder ? t.challengeTitle : t.headline}</h1>
           <p>
             {builder
@@ -436,6 +458,9 @@ export default function App() {
               {challengeUrl ? (
                 <div className="challenge-ready">
                   <h2>{t.challengeReady}</h2>
+                  {createdChallenge && (
+                    <ChallengeMovie movie={createdChallenge.movie} locale={locale} t={t} />
+                  )}
                   <label htmlFor="challenge-link">{t.challenge}</label>
                   <input
                     id="challenge-link"
@@ -447,7 +472,7 @@ export default function App() {
                     <button type="button" className="primary" onClick={() => void copyChallenge()}>
                       {t.copy}
                     </button>
-                    <button type="button" onClick={() => setChallengeUrl("")}>
+                    <button type="button" onClick={() => setCreatedChallenge(null)}>
                       {t.createAnother}
                     </button>
                   </div>
@@ -650,7 +675,6 @@ export default function App() {
         </div>
       </main>
       <footer>
-        <span>{t.footer}</span>
         <span>
           {catalogSize !== null && `${catalogSize} ${t.catalog} · `}
           {tmdbData ? t.mixedData : t.openData}

@@ -184,10 +184,13 @@ export function importedMedia(raw: unknown, movie: Movie, data: IdentityData) {
         cast: z.array(z.object({ id: z.number(), profile_path: z.string().nullable().optional() })),
         crew: z.array(z.object({ id: z.number(), profile_path: z.string().nullable().optional() })),
       }),
+      production_companies: z
+        .array(z.object({ id: z.number(), logo_path: z.string().nullable().optional() }))
+        .default([]),
       production_countries: z.array(z.object({ iso_3166_1: z.string() })),
     })
     .parse(raw);
-  const media: MovieMedia = { people: {}, countries: {} };
+  const media: MovieMedia = { people: {}, countries: {}, studios: {} };
   const poster = tmdbImage(parsed.poster_path, `https://www.themoviedb.org/movie/${parsed.id}`);
   if (poster) media.poster = poster;
   const wanted = new Set([...movie.actors, ...movie.directors].map((p) => p.id));
@@ -195,6 +198,12 @@ export function importedMedia(raw: unknown, movie: Movie, data: IdentityData) {
     const id = data.identities[`tmdb:person:${p.id}`] ?? `tmdb:person:${p.id}`;
     const image = tmdbImage(p.profile_path, `https://www.themoviedb.org/person/${p.id}`);
     if (wanted.has(id) && image) media.people[id] = image;
+  }
+  for (const company of parsed.production_companies) {
+    const key = `tmdb:studio:${company.id}`;
+    const id = data.identities[key] ?? key;
+    const image = tmdbImage(company.logo_path, `https://www.themoviedb.org/company/${company.id}`);
+    if (movie.studios.some((s) => s.id === id) && image && media.studios) media.studios[id] = image;
   }
   for (const c of parsed.production_countries) {
     const key = `iso:${c.iso_3166_1}`;

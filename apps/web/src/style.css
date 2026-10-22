@@ -1435,8 +1435,13 @@ footer {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
   min-width: 0;
+}
+.studio-token .entity-name {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 .people-list {
   display: flex;
@@ -1693,6 +1698,9 @@ footer {
   margin: 0 0 8px;
 }
 .guess-people .clue {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   min-height: 0;
   padding: 12px 8px 8px;
   background: transparent;
@@ -1703,6 +1711,7 @@ footer {
   right: 0;
 }
 .guess-people .people-list {
+  align-items: flex-start;
   gap: 12px;
   overflow-x: auto;
   padding-bottom: 4px;
@@ -1791,6 +1800,8 @@ footer {
 }
 .guess-people .people-status {
   position: static;
+  align-self: flex-start;
+  max-width: 100%;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -1957,7 +1968,8 @@ footer {
     align-self: end;
     font-size: 18px;
   }
-  .answer-overview p {
+  .answer-overview p,
+  .answer-overview .answer-studios {
     grid-column: 1 / -1;
     margin: 0;
   }
@@ -1972,11 +1984,6 @@ footer {
   }
 }
 
-.clue[data-kind="genres"]:has(.clue-more[open]) > .entity-list .entity-name {
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
-
 footer:has(.catalog-credit) {
   flex-wrap: wrap;
 }
@@ -1984,4 +1991,62 @@ footer .catalog-credit {
   flex-basis: 100%;
   margin-top: 12px;
   flex-wrap: wrap;
+}
+
+.studio-logo {
+  display: flex;
+  flex: 0 0 54px;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 36px;
+  padding: 5px;
+  border-radius: 5px;
+  background: #f5f7fa;
+}
+.studio-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.studio-token {
+  gap: 7px;
+  align-items: center;
+}
+.answer-studios {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.answer-studios .studio-token {
+  display: inline-flex;
+}
+
+.challenge-movie {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 12px 16px;
+  padding: 16px;
+  margin-bottom: 24px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--miss);
+}
+.challenge-movie > .movie-poster {
+  width: 84px;
+  height: 126px;
+}
+.challenge-movie h3 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+.challenge-movie p {
+  margin: 0 0 6px;
+  color: var(--muted);
+}
+.challenge-movie > .media-credits {
+  grid-column: 1 / -1;
 }

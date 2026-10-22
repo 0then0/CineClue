@@ -92,6 +92,8 @@ export const mediaImageSchema = z.object({
 });
 export const movieMediaSchema = z.object({
   poster: mediaImageSchema.optional(),
+  studios: z.record(z.string(), mediaImageSchema).optional(),
+  studioFallbackChecked: z.boolean().optional(),
   people: z.record(z.string(), mediaImageSchema),
   countries: z.record(z.string(), z.string().regex(/^[A-Z]{2}$/)),
 });

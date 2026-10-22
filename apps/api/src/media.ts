@@ -44,6 +44,9 @@ const commons = z.object({
 const person = z.object({ id: z.number(), profile_path: z.string().nullable().optional() });
 const tmdbMovie = z.object({
   poster_path: z.string().nullable().optional(),
+  production_companies: z
+    .array(z.object({ id: z.number(), logo_path: z.string().nullable().optional() }))
+    .default([]),
   credits: z.object({ cast: z.array(person), crew: z.array(person) }),
 });
 const empty = (): MovieMedia => ({ people: {}, countries: {} });
@@ -88,17 +91,32 @@ export async function loadMovieMedia(
   token?: string,
   stored: MovieMedia = empty(),
 ): Promise<MovieMedia> {
-  const result = { ...stored, people: { ...stored.people }, countries: { ...stored.countries } };
+  const result = {
+    ...stored,
+    studios: stored.studios ? { ...stored.studios } : undefined,
+    people: { ...stored.people },
+    countries: { ...stored.countries },
+  };
   const people = [...movie.directors, ...movie.actors];
-  if (result.poster && people.every((p) => result.people[p.id])) return result;
+  if (
+    result.studios !== undefined &&
+    (result.studioFallbackChecked || movie.studios.every((s) => result.studios?.[s.id])) &&
+    result.poster &&
+    people.every((p) => result.people[p.id])
+  )
+    return result;
   const ids = [
     ...new Set(
-      [movie.id, ...people.map((p) => p.id), ...movie.countries.map((c) => c.id)].filter((id) =>
-        /^Q\d+$/.test(id),
-      ),
+      [
+        movie.id,
+        ...people.map((p) => p.id),
+        ...movie.countries.map((c) => c.id),
+        ...movie.studios.filter((s) => !result.studios?.[s.id]).map((s) => s.id),
+      ].filter((id) => /^Q\d+$/.test(id)),
     ),
   ];
   let entities: z.infer<typeof wikidata>["entities"] = {};
+  let entitiesLoaded = false;
   try {
     if (ids.length) {
       const url = new URL("https://www.wikidata.org/w/api.php");
@@ -109,6 +127,7 @@ export async function loadMovieMedia(
         ids: ids.join("|"),
       }).toString();
       entities = wikidata.parse(await request(url)).entities;
+      entitiesLoaded = true;
     }
   } catch {
     /* Media must never prevent playing. */
@@ -132,6 +151,15 @@ export async function loadMovieMedia(
             token,
           ),
         );
+        result.studios ??= {};
+        for (const company of data.production_companies) {
+          const id = `tmdb:studio:${company.id}`;
+          const image = tmdbImage(
+            company.logo_path,
+            `https://www.themoviedb.org/company/${company.id}`,
+          );
+          if (movie.studios.some((s) => s.id === id) && image) result.studios[id] ??= image;
+        }
         result.poster ??= tmdbImage(data.poster_path, `https://www.themoviedb.org/movie/${id}`);
         for (const p of people) {
           const personId = p.id.match(/^tmdb:person:(\d+)$/)?.[1] ?? value(p.id, "P4985");
@@ -149,10 +177,11 @@ export async function loadMovieMedia(
       }
     }
   }
+  const studioIds = new Set(movie.studios.map((s) => s.id));
   const files = new Map<string, string[]>();
-  for (const id of [movie.id, ...people.map((p) => p.id)]) {
-    if ((id === movie.id && result.poster) || result.people[id]) continue;
-    const file = value(id, "P18");
+  for (const id of [movie.id, ...people.map((p) => p.id), ...studioIds]) {
+    if ((id === movie.id && result.poster) || result.people[id] || result.studios?.[id]) continue;
+    const file = value(id, studioIds.has(id) ? "P154" : "P18");
     if (file && !file.includes("|") && file.length < 240) {
       const title = `File:${file.replaceAll("_", " ")}`;
       files.set(title, [...(files.get(title) ?? []), id]);
@@ -170,6 +199,7 @@ export async function loadMovieMedia(
         titles: [...files.keys()].join("|"),
       }).toString();
       const pages = commons.parse(await request(url)).query.pages;
+      if (entitiesLoaded) result.studioFallbackChecked = true;
       for (const page of Object.values(pages)) {
         const info = page.imageinfo?.[0];
         if (!info?.thumburl) continue;
@@ -189,7 +219,10 @@ export async function loadMovieMedia(
           provider: "commons",
         };
         for (const id of files.get(page.title) ?? []) {
-          if (id === movie.id) result.poster = image;
+          if (studioIds.has(id)) {
+            result.studios ??= {};
+            result.studios[id] = image;
+          } else if (id === movie.id) result.poster = image;
           else result.people[id] = image;
         }
       }
@@ -197,6 +230,7 @@ export async function loadMovieMedia(
       /* Missing files or providers leave readable placeholders. */
     }
   }
+  if (!files.size && entitiesLoaded) result.studioFallbackChecked = true;
   return result;
 }
 
@@ -221,7 +255,12 @@ export class MediaCatalog {
     const movie = this.catalog.byId.get(id);
     if (!movie) return;
     const stored = this.stored[id];
-    if (stored?.poster && [...movie.directors, ...movie.actors].every((p) => stored.people[p.id]))
+    if (
+      stored?.studios !== undefined &&
+      (stored.studioFallbackChecked || movie.studios.every((s) => stored.studios?.[s.id])) &&
+      stored.poster &&
+      [...movie.directors, ...movie.actors].every((p) => stored.people[p.id])
+    )
       return Promise.resolve(stored);
     const cached = this.cache.get(id);
     if (cached && cached.expires > Date.now()) return cached.value;
@@ -236,7 +275,12 @@ export class MediaCatalog {
       try {
         const media = await loadMovieMedia(movie, this.token, this.stored[id]);
         entry.expires =
-          Date.now() + (media.poster || Object.keys(media.people).length ? 86400000 : 900000);
+          Date.now() +
+          (media.poster ||
+          Object.keys(media.people).length ||
+          Object.keys(media.studios ?? {}).length
+            ? 86400000
+            : 900000);
         return media;
       } catch {
         return empty();

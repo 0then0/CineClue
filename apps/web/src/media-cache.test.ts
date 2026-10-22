@@ -32,6 +32,7 @@ it("shares simultaneous requests and persists results across module reloads", as
   const reloaded = await import("./media-cache.ts");
   expect(await reloaded.loadMovieMedia("film")).toEqual(media);
   expect(fetch).toHaveBeenCalledTimes(1);
+  expect(fetch.mock.calls[0][1].cache).toBe("no-cache");
 });
 it("refreshes images after 24 hours and empty results after 15 minutes", async () => {
   const clock = vi.spyOn(Date, "now").mockReturnValue(1000000);
@@ -53,7 +54,7 @@ it("refreshes images after 24 hours and empty results after 15 minutes", async (
   expect(emptyFetch).toHaveBeenCalledTimes(2);
 });
 it("does not cache failed or malformed responses and recovers from corrupt storage", async () => {
-  localStorage.setItem("cineclue:media:v2", "broken json");
+  localStorage.setItem("cineclue:media:v4", "broken json");
   const fetch = vi
     .fn()
     .mockRejectedValueOnce(new Error("offline"))
@@ -81,7 +82,22 @@ it("bounds persisted entries to 100 films", async () => {
   vi.spyOn(Date, "now").mockReturnValue(1000000);
   mockMedia();
   for (let i = 0; i < 105; i++) await loadMovieMedia(`film${i}`);
-  const stored = JSON.parse(localStorage.getItem("cineclue:media:v2") ?? "{}");
+  const stored = JSON.parse(localStorage.getItem("cineclue:media:v4") ?? "{}");
   expect(Object.keys(stored)).toHaveLength(100);
   expect(stored.film104.media).toEqual(media);
+});
+
+it("keeps studio-only metadata for 24 hours and reuses it after a reload", async () => {
+  const clock = vi.spyOn(Date, "now").mockReturnValue(1000000);
+  const studioOnly = { people: {}, countries: {}, studios: { studio: media.poster } };
+  const fetch = mockMedia(studioOnly);
+  await loadMovieMedia("studio-only");
+  clock.mockReturnValue(1000000 + 3600000);
+  vi.resetModules();
+  const reloaded = await import("./media-cache.ts");
+  expect(await reloaded.loadMovieMedia("studio-only")).toEqual(studioOnly);
+  expect(fetch).toHaveBeenCalledTimes(1);
+  clock.mockReturnValue(1000000 + 86400000);
+  await reloaded.loadMovieMedia("studio-only");
+  expect(fetch).toHaveBeenCalledTimes(2);
 });

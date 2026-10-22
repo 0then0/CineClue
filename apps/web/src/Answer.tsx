@@ -1,6 +1,6 @@
 import type { Movie } from "../../../packages/game-engine/src/model.ts";
 import { type Locale, type Messages, titleOf } from "./i18n.ts";
-import { flag, MediaCredits, MediaPicture, useMovieMedia } from "./Media.tsx";
+import { flag, MediaCredits, MediaPicture, StudioLogo, useMovieMedia } from "./Media.tsx";
 
 export function Answer({ movie, locale, t }: { movie: Movie; locale: Locale; t: Messages }) {
   const media = useMovieMedia(movie.id);
@@ -30,9 +30,18 @@ export function Answer({ movie, locale, t }: { movie: Movie; locale: Locale; t: 
               </span>
             ))}
           </p>
-          <p>
-            <b>{t.studios}:</b> {movie.studios.map((e) => e.names[locale] ?? e.name).join(", ")}
-          </p>
+          <div className="answer-studios">
+            <b>{t.studios}:</b>
+            {movie.studios.map((e) => (
+              <span className="studio-token" key={e.id}>
+                <StudioLogo
+                  key={media.studios?.[e.id]?.url ?? e.id}
+                  image={media.studios?.[e.id]}
+                />
+                <span>{e.names[locale] ?? e.name}</span>
+              </span>
+            ))}
+          </div>
         </div>
       </div>
       <div className="answer-people">

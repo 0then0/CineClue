@@ -23,7 +23,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "format": "biome check --write .",
-    "check": "pnpm data:validate && pnpm typecheck && pnpm lint && pnpm test && pnpm build"
+    "check": "pnpm data:validate && pnpm typecheck && pnpm lint && pnpm test && pnpm build",
+    "data:media": "node scripts/import_movies/enrich-studio-media.ts"
   },
   "dependencies": {
     "react": "19.3.1",

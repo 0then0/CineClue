@@ -192,6 +192,7 @@ it("serves complete imported image metadata without provider calls or queue satu
   const { MediaCatalog, tmdbImage } = await import("../src/media.ts");
   const movie = mediaMovie();
   const stored = {
+    studios: {},
     poster: tmdbImage("/poster.jpg", "https://www.themoviedb.org/movie/1"),
     people: { Q2: tmdbImage("/portrait.jpg", "https://www.themoviedb.org/person/2") },
     countries: { Q30: "US" },
@@ -208,6 +209,37 @@ it("serves complete imported image metadata without provider calls or queue satu
     const results = await Promise.all(Array.from({ length: 30 }, () => media.get("Q1")));
     expect(results.every((r) => r?.poster?.url.endsWith("/poster.jpg"))).toBe(true);
     expect(fetcher).not.toHaveBeenCalled();
+  } finally {
+    fetcher.mockRestore();
+  }
+});
+
+it("falls back to licensed Commons studio logos even when poster and cast are complete", async () => {
+  const { loadMovieMedia, tmdbImage } = await import("../src/media.ts");
+  const movie = { ...mediaMovie(), studios: [{ id: "Q10", name: "Studio", names: {} }] };
+  const poster = tmdbImage("/poster.jpg", "https://www.themoviedb.org/movie/1");
+  if (!poster) throw Error("Expected poster");
+  const stored = { poster, people: { Q2: poster }, countries: {}, studios: {} };
+  const fetcher = vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+    const url = String(input);
+    return new Response(
+      JSON.stringify(
+        url.includes("wikidata.org")
+          ? { entities: { Q10: { claims: { P154: [mediaClaim("Studio.svg")] } } } }
+          : { query: { pages: { "1": mediaPage("Studio.svg", "Public domain") } } },
+      ),
+    );
+  });
+  try {
+    const result = await loadMovieMedia(movie, undefined, stored);
+    expect(result.studios?.Q10.provider).toBe("commons");
+    expect(result.studios?.Q10.source).toContain("File:Studio.svg");
+    expect(result.studioFallbackChecked).toBe(true);
+    expect(stored.studios).toEqual({});
+    expect(result.poster).toEqual(poster);
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    await loadMovieMedia(movie, undefined, result);
+    expect(fetcher).toHaveBeenCalledTimes(2);
   } finally {
     fetcher.mockRestore();
   }
