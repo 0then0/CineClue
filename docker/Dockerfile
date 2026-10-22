@@ -1,4 +1,4 @@
-FROM node:24-bookworm-slim@sha256:8cabefbd444809cf0e319b5831c65da1ea202200ca552a5e75fd7938a6f86658 AS base
+FROM node:25-bookworm-slim@sha256:81db02c4b671288a03915da9534dbd54f96d0e7c24d80ccc54f5b36b2e684370 AS base
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@12.14.0 --activate
 FROM base AS build
@@ -15,7 +15,7 @@ COPY apps/api/package.json apps/api/package.json
 COPY apps/web/package.json apps/web/package.json
 COPY packages/game-engine/package.json packages/game-engine/package.json
 RUN pnpm install --prod --frozen-lockfile --ignore-scripts
-FROM node:24-bookworm-slim@sha256:8cabefbd444809cf0e319b5831c65da1ea202200ca552a5e75fd7938a6f86658 AS runtime
+FROM node:25-bookworm-slim@sha256:81db02c4b671288a03915da9534dbd54f96d0e7c24d80ccc54f5b36b2e684370 AS runtime
 WORKDIR /app
 ENV NODE_ENV=production PORT=3001 STATIC_ROOT=/app/apps/web/dist
 COPY --from=production-deps --chown=node:node /app/node_modules ./node_modules
