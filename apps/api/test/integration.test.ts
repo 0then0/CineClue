@@ -7,6 +7,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import netlifyApi from "../../../netlify/functions/api.ts";
 import cleanup from "../../../netlify/functions/cleanup.ts";
 import { compareMovies, compareSet } from "../../../packages/game-engine/src/index.ts";
+import { writeCatalog } from "../../../scripts/import_movies/seed-catalog.ts";
 import { Catalog, loadCatalog } from "../src/catalog.ts";
 import { selectDaily } from "../src/daily.ts";
 import { pool } from "../src/db.ts";
@@ -117,6 +118,118 @@ describe.skipIf(!enabled)("API + disposable PostgreSQL", () => {
       .rows;
     expect(rows).toEqual([{ key: `${prefix}:live` }]);
     expect((await pool.query("SELECT COUNT(*) FROM game_session")).rows[0].count).toBe(before);
+  });
+  it("bulk import merges identities, preserves cast order, replaces relations and rolls back atomically", async () => {
+    const client = await pool.connect();
+    const prefix = `bulk:${randomUUID()}`;
+    const person = { id: `${prefix}:person`, name: "First's name", names: { en: "First" } };
+    const first = {
+      ...catalog.movies[0],
+      id: `${prefix}:one`,
+      title: "A film's title",
+      directors: [person],
+      actors: [person, { ...person, id: `${prefix}:actor2` }],
+      aliases: ["An alias", "An alias"],
+    };
+    const last = {
+      ...first,
+      id: `${prefix}:two`,
+      directors: [{ ...person, name: "Last", names: { ru: "Последний" } }],
+    };
+    try {
+      await client.query("BEGIN");
+      await writeCatalog(client, [first, last], [], false, () => {});
+      expect(
+        (await client.query("SELECT title FROM movie WHERE id=$1", [first.id])).rows[0].title,
+      ).toBe(first.title);
+      // The last occurrence is in last.actors, matching the original row-by-row order.
+      expect(
+        (await client.query("SELECT name,names FROM person WHERE id=$1", [person.id])).rows[0],
+      ).toEqual({ name: person.name, names: { en: "First", ru: "Последний" } });
+      expect(
+        (
+          await client.query(
+            "SELECT person_id FROM movie_person WHERE movie_id=$1 AND role='actor' ORDER BY position",
+            [first.id],
+          )
+        ).rows.map((r) => r.person_id),
+      ).toEqual(first.actors.map((a) => a.id));
+      expect(
+        (await client.query("SELECT name FROM alias WHERE movie_id=$1", [first.id])).rows,
+      ).toEqual([{ name: "An alias" }]);
+      await writeCatalog(
+        client,
+        [{ ...first, aliases: ["Replacement"], actors: [first.actors[1]] }],
+        [],
+        false,
+        () => {},
+      );
+      expect(
+        (await client.query("SELECT name FROM alias WHERE movie_id=$1", [first.id])).rows,
+      ).toEqual([{ name: "Replacement" }]);
+      expect(
+        (
+          await client.query(
+            "SELECT person_id FROM movie_person WHERE movie_id=$1 AND role='actor'",
+            [first.id],
+          )
+        ).rows,
+      ).toEqual([{ person_id: first.actors[1].id }]);
+      const invalid = { ...last, runtime: -1 };
+      await expect(writeCatalog(client, [invalid], [], false, () => {})).rejects.toThrow();
+      await client.query("ROLLBACK");
+      expect((await client.query("SELECT id FROM movie WHERE id=$1", [first.id])).rowCount).toBe(0);
+    } finally {
+      await client.query("ROLLBACK");
+      client.release();
+    }
+  });
+  it("additive bulk import retains existing entity facts and first occurrence for new identities", async () => {
+    const client = await pool.connect();
+    const prefix = `preserve:${randomUUID()}`;
+    const person = { id: `${prefix}:person`, name: "Original", names: { en: "Original" } };
+    const first = { ...catalog.movies[0], id: `${prefix}:one`, directors: [person], actors: [] };
+    try {
+      await client.query("BEGIN");
+      await writeCatalog(client, [first], [], true, () => {});
+      await writeCatalog(
+        client,
+        [
+          {
+            ...first,
+            id: `${prefix}:two`,
+            directors: [{ ...person, name: "Changed", names: { ru: "Изменён" } }],
+          },
+        ],
+        [],
+        true,
+        () => {},
+      );
+      expect(
+        (await client.query("SELECT name,names FROM person WHERE id=$1", [person.id])).rows[0],
+      ).toEqual({ name: "Original", names: { en: "Original" } });
+      const fresh = { ...person, id: `${prefix}:fresh` };
+      await writeCatalog(
+        client,
+        [
+          {
+            ...first,
+            id: `${prefix}:three`,
+            directors: [fresh],
+            actors: [{ ...fresh, name: "Later" }],
+          },
+        ],
+        [],
+        true,
+        () => {},
+      );
+      expect(
+        (await client.query("SELECT name FROM person WHERE id=$1", [fresh.id])).rows[0].name,
+      ).toBe("Original");
+    } finally {
+      await client.query("ROLLBACK");
+      client.release();
+    }
   });
   it("compares new guesses with legacy genres for a pre-taxonomy game", async () => {
     const target = catalog.byId.get("Q83495");

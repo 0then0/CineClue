@@ -64,13 +64,13 @@ No Netlify personal access token or site ID is required. Neither workflow runs o
 
 After these changes are committed to remote `main`:
 1. Open GitHub **Actions → Production database → Run workflow** on `main`. Choose `initialize-catalog`. This applies migrations, then imports the committed 10,000-film catalog only if the database is empty. It does not contact TMDB.
-2. Wait for successful completion. Import runs outside Functions in a single transaction and can take substantially longer over the network than locally. Use a nearby runner if network round trips become a bottleneck. A failed import rolls back its catalog transaction and can be retried; committed migrations remain applied.
+2. Wait for successful completion. Import runs outside Functions in a single transaction. Rows are sent in batches of at most 1,000 using parameterized JSON recordsets, with progress logged for each batch and a 30-minute workflow deadline. Network latency and database compute still affect the duration. A failed import rolls back its catalog transaction and can be retried; committed migrations remain applied.
 3. Open **Actions → Deploy production → Run workflow** on `main`.
 4. Follow the build in Netlify **Deploys**. A green GitHub deploy-trigger workflow means Netlify accepted the hook, not that publication succeeded. The hook builds the latest remote `main` when Netlify processes it; it does not pin the triggering workflow's SHA. Avoid pushing another commit while that build is queued if a specific revision is required.
 5. Open `https://<your-domain>/api/health`. Expect `{"status":"ok","movies":10000}`. Then test search, a guess, a hint, a challenge link opened directly, progress after reload, and both themes.
 6. In Netlify **Functions**, verify `api` and `cleanup`. `cleanup` should have a Scheduled badge. Use **Run now** to test it; scheduled functions are not public HTTP cleanup endpoints.
 
-For later schema-only changes, run the database workflow with `migrate` before deployment. `update-catalog` explicitly replaces catalog facts while preserving existing target snapshots. Back up the database before this operation, pause public writes while replacing catalog facts, then redeploy all functions so their in-memory catalogs match. A normal frontend/API deployment never migrates or imports data.
+For later schema-only changes, run the database workflow with `migrate` before deployment. `update-catalog` explicitly replaces catalog facts while preserving existing target snapshots. The initial-empty check runs under the import lock, so concurrent initializers cannot overwrite a catalog that another initializer has just committed. Back up the database before this operation, pause public writes while replacing catalog facts, then redeploy all functions so their in-memory catalogs match. A normal frontend/API deployment never migrates or imports data.
 
 ### Runtime limits and cold-start measurement
 
