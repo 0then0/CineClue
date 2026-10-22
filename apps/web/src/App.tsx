@@ -9,6 +9,8 @@ import { Answer } from "./Answer.tsx";
 import { Clues } from "./Clues.tsx";
 import { Confetti } from "./Confetti.tsx";
 import { api, HttpError, readStorage, writeStorage } from "./client.ts";
+import { useBackdropClose } from "./dialog.ts";
+import { HelpDialog } from "./Help.tsx";
 import { Hints } from "./Hints.tsx";
 import { dictionaries, type Locale, type Messages, titleOf } from "./i18n.ts";
 import { MediaCredits, MediaPicture, useMovieMedia } from "./Media.tsx";
@@ -22,7 +24,7 @@ type Pack = {
   name: Record<string, string>;
   count: number;
   counts?: Record<Difficulty, number>;
-  category?: "all" | "genre" | "era" | "director";
+  category?: "all" | "genre" | "era" | "director" | "country";
   rules?: { yearMin?: number; yearMax?: number };
 };
 type Theme = "system" | "light" | "dark";
@@ -61,11 +63,12 @@ function StatsDialog({
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const data = stats(records);
+  const backdropClose = useBackdropClose();
   useEffect(() => {
     ref.current?.showModal();
   }, []);
   return (
-    <dialog ref={ref} className="stats-dialog" onClose={onClose}>
+    <dialog ref={ref} className="stats-dialog" onClose={onClose} {...backdropClose}>
       <div className="dialog-heading">
         <h2>{t.stats}</h2>
         <button type="button" onClick={() => ref.current?.close()} aria-label={t.closeDialog}>
@@ -117,6 +120,7 @@ export default function App() {
   const [error, setError] = useState<unknown>(null);
   const [notice, setNotice] = useState("");
   const [records, setRecords] = useState<DailyRecord[]>(readRecords);
+  const [showHelp, setShowHelp] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [builder, setBuilder] = useState(false);
   const [createdChallenge, setCreatedChallenge] = useState<{
@@ -366,6 +370,23 @@ export default function App() {
         <div className="utilities">
           <button
             type="button"
+            className="utility-button help-button"
+            aria-label={t.help}
+            title={t.help}
+            onClick={() => setShowHelp(true)}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M8 8a4 4 0 1 1 6.5 3.1C13 12.2 12 12.8 12 15"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <circle cx="12" cy="19" r="1.2" fill="currentColor" />
+            </svg>
+          </button>
+          <button
+            type="button"
             className="utility-button"
             onClick={() => setShowStats(true)}
             aria-label={t.stats}
@@ -519,7 +540,7 @@ export default function App() {
                             {p.name[locale] ?? p.name.en} ({p.counts?.[difficulty] ?? p.count})
                           </option>
                         ))}
-                      {(["genre", "era", "director"] as const).map((category) => (
+                      {(["genre", "country", "era", "director"] as const).map((category) => (
                         <optgroup key={category} label={t[`${category}Collections`]}>
                           {packs
                             .filter(
@@ -622,13 +643,6 @@ export default function App() {
                     pending={pending}
                     onUse={useHint}
                   />
-                  <div className="legend">
-                    <span className="exact">✓ {t.exact}</span>
-                    <span className="partial">
-                      ≈ {t.partial} / {t.close}
-                    </span>
-                    <span>× {t.miss}</span>
-                  </div>
                   <Clues game={game} locale={locale} t={t} />
                 </>
               )}
@@ -659,13 +673,6 @@ export default function App() {
         </section>
         <Tips t={t} />
         <div className="below-game">
-          <details>
-            <summary>
-              {t.help}
-              <span>+</span>
-            </summary>
-            <p>{t.helpText}</p>
-          </details>
           {game?.mode === "daily" && !builder && (
             <p className="countdown">
               {t.nextDaily} <strong>{countdown}</strong>
@@ -688,6 +695,7 @@ export default function App() {
           </div>
         )}
       </footer>
+      {showHelp && <HelpDialog t={t} onClose={() => setShowHelp(false)} />}
       {showStats && <StatsDialog records={records} t={t} onClose={() => setShowStats(false)} />}
     </>
   );

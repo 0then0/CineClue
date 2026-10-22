@@ -22,7 +22,7 @@ Guess a mystery film through its connections to other movies. Each attempt compa
 ## Features
 
 - **Daily:** one shared puzzle, resetting at 00:00 UTC, with saved progress and browser statistics.
-- **Unlimited:** random puzzles with three difficulty levels and 29 film collections.
+- **Unlimited:** random puzzles with three difficulty levels and 42 film collections.
 - **Challenge:** choose a film and send a shareable puzzle link to a friend.
 - **10,000 films:** the catalog is included, so setup does not require a movie API key.
 - **Useful clues:** directional arrows, highlighted matches, portraits, posters and country flags.

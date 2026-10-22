@@ -3,6 +3,7 @@ export const entitySchema = z.object({
   id: z.string().min(1).max(120),
   name: z.string().min(1),
   names: z.record(z.string(), z.string()).default({}),
+  frequency: z.number().int().nonnegative().optional(),
 });
 export const movieSchema = z.object({
   id: z.string().min(1).max(120),
@@ -14,6 +15,8 @@ export const movieSchema = z.object({
   runtime: z.number().int().min(1).max(1500),
   countries: z.array(entitySchema).min(1),
   genres: z.array(entitySchema).min(1),
+  subgenres: z.array(entitySchema).optional(),
+  genreProfile: z.object({ version: z.literal(1), legacy: z.array(entitySchema) }).optional(),
   directors: z.array(entitySchema).min(1),
   actors: z.array(entitySchema).min(1).max(8),
   studios: z.array(entitySchema).min(1),
@@ -41,7 +44,7 @@ export type Comparison = {
   year: NumericResult;
   runtime: NumericResult;
   directors: SetResult;
-  genres: SetResult;
+  genres: SetResult & { subgenres?: SetResult; subgenresComparable?: boolean };
   actors: SetResult;
   countries: SetResult;
   studios: SetResult;

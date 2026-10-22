@@ -34,6 +34,7 @@ const en = {
   tipHintsBody:
     "A hint unlocks after 3 misses, and another after 7. Choose the clue you need; unused hints carry over within this game.",
   hints: "Hints",
+  hintsUsed: "Used",
   chooseHint: "Choose a hint",
   hintsIntro: "Reveal one detail about the mystery film. Each category can be used once.",
   hintsRemaining: "Hints available",
@@ -70,6 +71,8 @@ const en = {
   year: "Year",
   directors: "Director",
   genres: "Genres",
+  subgenres: "Subgenres",
+  noSubgenreData: "No comparable subgenre data",
   actors: "Cast",
   runtime: "Runtime",
   countries: "Country",
@@ -98,6 +101,7 @@ const en = {
   hard: "Hard",
   pack: "Film collection",
   genreCollections: "Genres & themes",
+  countryCollections: "Countries",
   eraCollections: "Decades & eras",
   directorCollections: "Directors",
   challengeTitle: "Set a mystery for a friend.",
@@ -107,7 +111,20 @@ const en = {
   copied: "Link copied",
   createAnother: "Choose another film",
   helpText:
-    "Find the mystery film in eight guesses. Each film you choose is compared across seven clues. ↑ means the answer is newer or longer, ↓ means older or shorter. Years within 3 and runtimes within 10 minutes are close. Underlined names are shared. A full match requires the same set of people or values. Cast shows up to five actors selected by source credit order or catalog connectivity. Daily resets at 00:00 UTC.",
+    "Find the mystery film in 8 guesses. Each guess is compared across 7 attributes: year, director, genres, cast, runtime, country and studio.",
+  helpColors: "Color guide",
+  helpExact: "Green: the value or complete set matches.",
+  helpPartial: "Yellow: some values are shared, or the number is close.",
+  helpMiss: "Neutral: no match. Missing subgenre data is marked separately.",
+  helpArrows: "Direction arrows",
+  helpNumbers:
+    "↑ The answer is newer or longer. ↓ The answer is older or shorter. Years within 3 and runtimes within 10 minutes are close.",
+  helpAttributes: "Reading the clues",
+  helpSets:
+    "Underlined names appear in both films. A complete match requires the same set of values. Cast shows up to five actors in source credit order. Genres and subgenres are compared separately; expand +N to see the remaining values.",
+  helpModes: "Game modes",
+  helpDaily:
+    "Daily gives everyone the same film and resets at 00:00 UTC. Unlimited lets you choose a collection and difficulty. Challenge lets you choose a film and share a link with a friend.",
   emptyCells: "Your clues will appear here",
   played: "Played",
   wins: "Wins",
@@ -173,6 +190,7 @@ const ru: Record<keyof typeof en, string> = {
   tipHintsBody:
     "После 3 промахов открывается одна подсказка, после 7 — ещё одна. Выбирайте нужный признак: неиспользованные подсказки сохраняются в пределах партии.",
   hints: "Подсказки",
+  hintsUsed: "Использовано",
   chooseHint: "Выберите подсказку",
   hintsIntro:
     "Откройте один факт о загаданном фильме. Каждую категорию можно использовать один раз.",
@@ -210,6 +228,8 @@ const ru: Record<keyof typeof en, string> = {
   year: "Год",
   directors: "Режиссёр",
   genres: "Жанры",
+  subgenres: "Поджанры",
+  noSubgenreData: "Нет уточняющих данных для сравнения",
   actors: "Актёры",
   runtime: "Длительность",
   countries: "Страна",
@@ -237,6 +257,7 @@ const ru: Record<keyof typeof en, string> = {
   hard: "Сложно",
   pack: "Подборка",
   genreCollections: "Жанры и темы",
+  countryCollections: "Страны",
   eraCollections: "Десятилетия и эпохи",
   directorCollections: "Режиссёры",
   challengeTitle: "Загадайте фильм другу.",
@@ -246,7 +267,20 @@ const ru: Record<keyof typeof en, string> = {
   copied: "Ссылка скопирована",
   createAnother: "Выбрать другой фильм",
   helpText:
-    "Угадайте фильм за восемь попыток. Каждый выбранный фильм сравнивается с ответом по семи признакам. ↑ означает, что ответ новее или длиннее, ↓ — старше или короче. Разница до 3 лет и до 10 минут считается близкой. Общие имена подчёркнуты. Полное совпадение требует одинакового набора значений. В составе до пяти актёров, выбранных по порядку в источнике или связям в каталоге. Новый фильм дня появляется в 00:00 UTC.",
+    "Угадайте фильм за 8 попыток. Каждый ответ сравнивается по 7 признакам: год, режиссёр, жанры, актёры, длительность, страна и студия.",
+  helpColors: "Цвета подсказок",
+  helpExact: "Зелёный: значение или весь набор полностью совпадает.",
+  helpPartial: "Жёлтый: есть общие значения или число близко к ответу.",
+  helpMiss: "Нейтральный: совпадений нет. Отсутствие данных о поджанрах обозначается отдельно.",
+  helpArrows: "Направление стрелок",
+  helpNumbers:
+    "↑ Ответ новее или длиннее. ↓ Ответ старше или короче. Разница до 3 лет и до 10 минут считается близкой.",
+  helpAttributes: "Как читать признаки",
+  helpSets:
+    "Общие имена подчёркнуты. Полное совпадение требует одинакового набора значений. Показаны до пяти актёров в порядке титров источника. Жанры и поджанры сравниваются отдельно. Нажмите +N, чтобы увидеть оставшиеся значения.",
+  helpModes: "Режимы игры",
+  helpDaily:
+    "Фильм дня одинаков для всех и обновляется в 00:00 UTC. В режиме «Без границ» можно выбрать подборку и сложность. В режиме «Вызов» выберите фильм и отправьте ссылку другу.",
   emptyCells: "Здесь появятся ваши подсказки",
   played: "Сыграно",
   wins: "Побед",

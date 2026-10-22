@@ -153,7 +153,10 @@
       "ru": "Фильмы подборки «Боевики»"
     },
     "rules": {
-      "genreIds": ["Q188473", "Q3990883"]
+      "genreIds": [
+        "Q188473",
+        "Q3990883"
+      ]
     }
   },
   {
@@ -167,7 +170,9 @@
       "ru": "Фильмы подборки «Приключения»"
     },
     "rules": {
-      "genreIds": ["Q319221"]
+      "genreIds": [
+        "Q319221"
+      ]
     }
   },
   {
@@ -181,7 +186,12 @@
       "ru": "Фильмы подборки «Комедии»"
     },
     "rules": {
-      "genreIds": ["Q157443", "Q859369", "Q860626", "Q118612349"]
+      "genreIds": [
+        "Q157443",
+        "Q859369",
+        "Q860626",
+        "Q118612349"
+      ]
     }
   },
   {
@@ -195,7 +205,9 @@
       "ru": "Фильмы подборки «Драмы»"
     },
     "rules": {
-      "genreIds": ["Q130232"]
+      "genreIds": [
+        "Q130232"
+      ]
     }
   },
   {
@@ -209,7 +221,10 @@
       "ru": "Фильмы подборки «Научная фантастика»"
     },
     "rules": {
-      "genreIds": ["Q471839", "Q20443008"]
+      "genreIds": [
+        "Q471839",
+        "Q20443008"
+      ]
     }
   },
   {
@@ -223,7 +238,9 @@
       "ru": "Фильмы подборки «Фэнтези»"
     },
     "rules": {
-      "genreIds": ["Q157394"]
+      "genreIds": [
+        "Q157394"
+      ]
     }
   },
   {
@@ -237,7 +254,9 @@
       "ru": "Фильмы подборки «Ужасы»"
     },
     "rules": {
-      "genreIds": ["Q200092"]
+      "genreIds": [
+        "Q200092"
+      ]
     }
   },
   {
@@ -251,7 +270,12 @@
       "ru": "Фильмы подборки «Триллеры»"
     },
     "rules": {
-      "genreIds": ["Q2484376", "Q19367312", "Q109733304", "Q11304653"]
+      "genreIds": [
+        "Q2484376",
+        "Q19367312",
+        "Q109733304",
+        "Q11304653"
+      ]
     }
   },
   {
@@ -265,7 +289,11 @@
       "ru": "Фильмы подборки «Криминальное кино»"
     },
     "rules": {
-      "genreIds": ["Q959790", "Q19367312", "Q113485322"]
+      "genreIds": [
+        "Q959790",
+        "Q19367312",
+        "Q113485322"
+      ]
     }
   },
   {
@@ -279,7 +307,9 @@
       "ru": "Фильмы подборки «Загадки и расследования»"
     },
     "rules": {
-      "genreIds": ["Q1200678"]
+      "genreIds": [
+        "Q1200678"
+      ]
     }
   },
   {
@@ -293,7 +323,11 @@
       "ru": "Фильмы подборки «Романтика»"
     },
     "rules": {
-      "genreIds": ["Q1054574", "Q860626", "Q118612349"]
+      "genreIds": [
+        "Q1054574",
+        "Q860626",
+        "Q118612349"
+      ]
     }
   },
   {
@@ -307,7 +341,9 @@
       "ru": "Фильмы подборки «Супергерои»"
     },
     "rules": {
-      "genreIds": ["Q1535153"]
+      "genreIds": [
+        "Q1535153"
+      ]
     }
   },
   {
@@ -321,7 +357,9 @@
       "ru": "Фильмы подборки «Мюзиклы»"
     },
     "rules": {
-      "genreIds": ["Q842256"]
+      "genreIds": [
+        "Q842256"
+      ]
     }
   },
   {
@@ -335,7 +373,9 @@
       "ru": "Фильмы подборки «Военное кино»"
     },
     "rules": {
-      "genreIds": ["Q369747"]
+      "genreIds": [
+        "Q369747"
+      ]
     }
   },
   {
@@ -452,7 +492,9 @@
       "ru": "Режиссёр подборки: Кристофер Нолан"
     },
     "rules": {
-      "directorIds": ["Q25191"]
+      "directorIds": [
+        "Q25191"
+      ]
     }
   },
   {
@@ -466,7 +508,9 @@
       "ru": "Режиссёр подборки: Стивен Спилберг"
     },
     "rules": {
-      "directorIds": ["Q8877"]
+      "directorIds": [
+        "Q8877"
+      ]
     }
   },
   {
@@ -480,7 +524,9 @@
       "ru": "Режиссёр подборки: Квентин Тарантино"
     },
     "rules": {
-      "directorIds": ["Q3772"]
+      "directorIds": [
+        "Q3772"
+      ]
     }
   },
   {
@@ -494,7 +540,9 @@
       "ru": "Режиссёр подборки: Альфред Хичкок"
     },
     "rules": {
-      "directorIds": ["Q7374"]
+      "directorIds": [
+        "Q7374"
+      ]
     }
   },
   {
@@ -508,7 +556,9 @@
       "ru": "Режиссёр подборки: Мартин Скорсезе"
     },
     "rules": {
-      "directorIds": ["Q41148"]
+      "directorIds": [
+        "Q41148"
+      ]
     }
   },
   {
@@ -522,7 +572,234 @@
       "ru": "Режиссёр подборки: Хаяо Миядзаки"
     },
     "rules": {
-      "directorIds": ["Q55400"]
+      "directorIds": [
+        "Q55400"
+      ]
+    }
+  },
+  {
+    "id": "country-russia-ussr",
+    "name": {
+      "en": "Russia & USSR",
+      "ru": "Россия и СССР"
+    },
+    "description": {
+      "en": "Films produced in Russia & USSR, including co-productions",
+      "ru": "Фильмы: Россия и СССР, включая совместное производство"
+    },
+    "rules": {
+      "countryIds": [
+        "Q159",
+        "Q15180",
+        "iso:RU",
+        "iso:SU"
+      ]
+    }
+  },
+  {
+    "id": "country-usa",
+    "name": {
+      "en": "United States",
+      "ru": "США"
+    },
+    "description": {
+      "en": "Films produced in United States, including co-productions",
+      "ru": "Фильмы: США, включая совместное производство"
+    },
+    "rules": {
+      "countryIds": [
+        "Q30",
+        "iso:US"
+      ]
+    }
+  },
+  {
+    "id": "country-uk",
+    "name": {
+      "en": "United Kingdom",
+      "ru": "Великобритания"
+    },
+    "description": {
+      "en": "Films produced in United Kingdom, including co-productions",
+      "ru": "Фильмы: Великобритания, включая совместное производство"
+    },
+    "rules": {
+      "countryIds": [
+        "Q145",
+        "iso:GB"
+      ]
+    }
+  },
+  {
+    "id": "country-france",
+    "name": {
+      "en": "France",
+      "ru": "Франция"
+    },
+    "description": {
+      "en": "Films produced in France, including co-productions",
+      "ru": "Фильмы: Франция, включая совместное производство"
+    },
+    "rules": {
+      "countryIds": [
+        "Q142",
+        "iso:FR"
+      ]
+    }
+  },
+  {
+    "id": "country-germany",
+    "name": {
+      "en": "Germany",
+      "ru": "Германия"
+    },
+    "description": {
+      "en": "Films produced in Germany, including co-productions",
+      "ru": "Фильмы: Германия, включая совместное производство"
+    },
+    "rules": {
+      "countryIds": [
+        "Q183",
+        "Q713750",
+        "Q41304",
+        "iso:DE"
+      ]
+    }
+  },
+  {
+    "id": "country-italy",
+    "name": {
+      "en": "Italy",
+      "ru": "Италия"
+    },
+    "description": {
+      "en": "Films produced in Italy, including co-productions",
+      "ru": "Фильмы: Италия, включая совместное производство"
+    },
+    "rules": {
+      "countryIds": [
+        "Q38",
+        "iso:IT"
+      ]
+    }
+  },
+  {
+    "id": "country-spain",
+    "name": {
+      "en": "Spain",
+      "ru": "Испания"
+    },
+    "description": {
+      "en": "Films produced in Spain, including co-productions",
+      "ru": "Фильмы: Испания, включая совместное производство"
+    },
+    "rules": {
+      "countryIds": [
+        "Q29",
+        "iso:ES"
+      ]
+    }
+  },
+  {
+    "id": "country-japan",
+    "name": {
+      "en": "Japan",
+      "ru": "Япония"
+    },
+    "description": {
+      "en": "Films produced in Japan, including co-productions",
+      "ru": "Фильмы: Япония, включая совместное производство"
+    },
+    "rules": {
+      "countryIds": [
+        "Q17",
+        "iso:JP"
+      ]
+    }
+  },
+  {
+    "id": "country-south-korea",
+    "name": {
+      "en": "South Korea",
+      "ru": "Южная Корея"
+    },
+    "description": {
+      "en": "Films produced in South Korea, including co-productions",
+      "ru": "Фильмы: Южная Корея, включая совместное производство"
+    },
+    "rules": {
+      "countryIds": [
+        "Q884",
+        "iso:KR"
+      ]
+    }
+  },
+  {
+    "id": "country-china",
+    "name": {
+      "en": "China",
+      "ru": "Китай"
+    },
+    "description": {
+      "en": "Films produced in China, including co-productions",
+      "ru": "Фильмы: Китай, включая совместное производство"
+    },
+    "rules": {
+      "countryIds": [
+        "Q148",
+        "iso:CN"
+      ]
+    }
+  },
+  {
+    "id": "country-india",
+    "name": {
+      "en": "India",
+      "ru": "Индия"
+    },
+    "description": {
+      "en": "Films produced in India, including co-productions",
+      "ru": "Фильмы: Индия, включая совместное производство"
+    },
+    "rules": {
+      "countryIds": [
+        "Q668",
+        "iso:IN"
+      ]
+    }
+  },
+  {
+    "id": "country-canada",
+    "name": {
+      "en": "Canada",
+      "ru": "Канада"
+    },
+    "description": {
+      "en": "Films produced in Canada, including co-productions",
+      "ru": "Фильмы: Канада, включая совместное производство"
+    },
+    "rules": {
+      "countryIds": [
+        "Q16",
+        "iso:CA"
+      ]
+    }
+  },
+  {
+    "id": "country-australia",
+    "name": {
+      "en": "Australia",
+      "ru": "Австралия"
+    },
+    "description": {
+      "en": "Films produced in Australia, including co-productions",
+      "ru": "Фильмы: Австралия, включая совместное производство"
+    },
+    "rules": {
+      "countryIds": [
+        "Q408",
+        "iso:AU"
+      ]
     }
   }
 ]

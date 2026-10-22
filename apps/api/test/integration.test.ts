@@ -4,7 +4,9 @@ import { once } from "node:events";
 import type { Server } from "node:http";
 import { promisify } from "node:util";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { compareMovies, compareSet } from "../../../packages/game-engine/src/index.ts";
 import { Catalog, loadCatalog } from "../src/catalog.ts";
+import { selectDaily } from "../src/daily.ts";
 import { pool } from "../src/db.ts";
 import { Games, utcDate } from "../src/game.ts";
 import { app } from "../src/http.ts";
@@ -50,6 +52,95 @@ describe.skipIf(!enabled)("API + disposable PostgreSQL", () => {
     if (server) await new Promise<void>((resolve) => server.close(() => resolve()));
     await pool.end();
   });
+  it("compares new guesses with legacy genres for a pre-taxonomy game", async () => {
+    const target = catalog.byId.get("Q83495");
+    const guess = catalog.byId.get("Q189600");
+    if (!target?.genreProfile || !guess?.genreProfile)
+      throw Error("Expected Matrix genre profiles");
+    const visitor = randomUUID();
+    const games = new Games(catalog, "test-secret-at-least-32-characters");
+    const game = await games.unlimited(visitor, "normal", "popular");
+    const legacy = {
+      ...target,
+      genres: target.genreProfile.legacy,
+      genreProfile: undefined,
+      subgenres: undefined,
+    };
+    await pool.query("UPDATE game_session SET target_id=$2,target_snapshot=$3 WHERE id=$1", [
+      game.id,
+      target.id,
+      JSON.stringify(legacy),
+    ]);
+    const result = await games.guess(game.id, visitor, guess.id);
+    expect(result.guesses[0].comparison.genres).toEqual(
+      compareSet(guess.genreProfile.legacy, target.genreProfile.legacy),
+    );
+    expect(result).not.toHaveProperty("answer");
+  });
+  it("loads normalized subgenres separately and retains legacy genre profiles", () => {
+    const films = catalog.movies.filter((m) => m.genreProfile);
+    expect(films).toHaveLength(10000);
+    expect(films.some((m) => m.subgenres?.length)).toBe(true);
+    expect(films.every((m) => m.genres.every((g) => !g.id.startsWith("subgenre:")))).toBe(true);
+    expect(films.every((m) => m.genreProfile?.legacy.length)).toBe(true);
+  });
+  it("matches country aliases against an existing target snapshot without rewriting earlier guesses", async () => {
+    const target = catalog.byId.get("tmdb:49106");
+    const previous = catalog.byId.get("Q125772");
+    const next = catalog.byId.get("Q118976");
+    if (!target || !previous || !next) throw Error("Missing Soviet country fixtures");
+    const visitor = randomUUID();
+    const games = new Games(catalog, "country-regression");
+    const challenge = (
+      await pool.query("INSERT INTO challenge(target_id) VALUES($1) RETURNING id", [target.id])
+    ).rows[0];
+    const game = await games.challenge(challenge.id, visitor);
+    const before = (
+      await pool.query("SELECT target_snapshot FROM game_session WHERE id=$1", [game.id])
+    ).rows[0].target_snapshot;
+    expect(before.countries[0].id).toBe("iso:SU");
+    const legacy = compareMovies(previous, target);
+    legacy.countries = { values: previous.countries, matches: [], status: "miss" };
+    await pool.query("INSERT INTO guess(game_id,ordinal,movie_id,comparison) VALUES($1,1,$2,$3)", [
+      game.id,
+      previous.id,
+      JSON.stringify(legacy),
+    ]);
+    const result = await games.guess(game.id, visitor, next.id);
+    expect(result.guesses[1].comparison.countries).toMatchObject({
+      status: "exact",
+      matches: [{ id: "Q15180" }],
+      values: [{ id: "Q15180" }],
+    });
+    expect(result.guesses[0].comparison).toEqual(legacy);
+    const after = (
+      await pool.query("SELECT target_snapshot FROM game_session WHERE id=$1", [game.id])
+    ).rows[0].target_snapshot;
+    expect(after).toEqual(before);
+    expect(
+      (await pool.query("SELECT comparison FROM guess WHERE game_id=$1 AND ordinal=1", [game.id]))
+        .rows[0].comparison,
+    ).toEqual(legacy);
+    const reloaded = await games.view(game.id, visitor);
+    expect(reloaded.guesses).toEqual(result.guesses);
+  });
+  it("matches Netherlands country aliases for a real co-production through the API", async () => {
+    const target = catalog.movies.find(
+      (m) => m.countries.length === 1 && m.countries[0].id === "iso:NL",
+    );
+    const guessed = catalog.movies.find((m) => m.countries.some((c) => c.id === "Q55"));
+    if (!target || !guessed) throw Error("Missing Netherlands country fixtures");
+    const visitor = randomUUID();
+    const games = new Games(catalog, "country-regression");
+    const challenge = (
+      await pool.query("INSERT INTO challenge(target_id) VALUES($1) RETURNING id", [target.id])
+    ).rows[0];
+    const game = await games.challenge(challenge.id, visitor);
+    const result = await games.guess(game.id, visitor, guessed.id);
+    expect(result.guesses[0].comparison.countries.status).toBe("partial");
+    expect(result.guesses[0].comparison.countries.matches.map((c) => c.id)).toEqual(["Q55"]);
+    expect(result).not.toHaveProperty("answer");
+  });
   it("rejects unknown media IDs and restricts external image hosts", async () => {
     const { r, data } = await request("/media/unknown-movie", cookie());
     expect(r.status).toBe(404);
@@ -82,6 +173,45 @@ describe.skipIf(!enabled)("API + disposable PostgreSQL", () => {
     expect(
       catalog.candidates("normal", "animation").some((m) => m.id === stored.rows[0].target_id),
     ).toBe(true);
+  });
+  it("persists one popular Daily under concurrent requests and excludes recent films and directors", async () => {
+    const date = utcDate();
+    const secret = "test-secret-at-least-32-characters";
+    const previous = selectDaily(catalog.dailyCandidates(), [], date, secret);
+    if (!previous) throw new Error("No Daily pool");
+    const yesterday = utcDate(new Date(Date.parse(`${date}T00:00:00Z`) - 86400000));
+    await pool.query(
+      "INSERT INTO daily_puzzle(puzzle_date,target_id,target_snapshot) VALUES($1,$2,$3)",
+      [yesterday, previous.id, JSON.stringify(previous)],
+    );
+    const games = new Games(catalog, secret);
+    const sessions = await Promise.all(Array.from({ length: 6 }, () => games.daily(randomUUID())));
+    const stored = (
+      await pool.query("SELECT target_id,target_snapshot FROM daily_puzzle WHERE puzzle_date=$1", [
+        date,
+      ])
+    ).rows[0];
+    expect(stored.target_id).not.toBe(previous.id);
+    expect(catalog.dailyCandidates().some((m) => m.id === stored.target_id)).toBe(true);
+    const previousDirectors = new Set(previous.directors.map((d) => d.id));
+    expect(
+      stored.target_snapshot.directors.some((d: { id: string }) => previousDirectors.has(d.id)),
+    ).toBe(false);
+    const targets = (
+      await pool.query("SELECT DISTINCT target_id FROM game_session WHERE id=ANY($1::uuid[])", [
+        sessions.map((s) => s.id),
+      ])
+    ).rows;
+    expect(targets).toEqual([{ target_id: stored.target_id }]);
+    // An already assigned day survives a changed or temporarily empty Daily pool.
+    const noPool = new Games(new Catalog(catalog.movies, catalog.packs), "changed-secret");
+    const resumed = await noPool.daily(randomUUID());
+    const assigned = (
+      await pool.query("SELECT target_id,target_snapshot FROM game_session WHERE id=$1", [
+        resumed.id,
+      ])
+    ).rows[0];
+    expect(assigned).toEqual(stored);
   });
   it("issues an HttpOnly cookie, resumes progress and gives every visitor the same daily target", async () => {
     const fresh = await fetch(`${base}/daily`);

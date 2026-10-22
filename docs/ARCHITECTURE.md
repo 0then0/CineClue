@@ -27,7 +27,7 @@ The server locks the session row during a guess or hint redemption. Duplicate gu
 
 ## Game modes
 
-Daily selects an eligible target with an HMAC of the UTC date and a server secret. PostgreSQL persists the assignment under a unique date constraint so concurrent visitors receive the same film. A stale Daily guess is rejected using its `If-Match` session ID.
+Daily uses a separate pool backed by the versioned TMDB audience snapshot in `data/daily-pool.json`: at least 5,000 votes, complete comparison attributes, three principal actors, at least twelve neighboring films through shared cast/directors and a guessability score of 75. Raw popularity scores from different providers are not used as interchangeable audience counts. Selection excludes films assigned in the preceding 180 UTC dates and, where alternatives exist, directors featured in the preceding seven days. A small exhausted custom pool reuses the least recently assigned eligible film. An HMAC of the UTC date and server secret selects among the remaining candidates. PostgreSQL persists the assignment under a unique date constraint so concurrent visitors receive the same film. Existing assignments are reused before evaluating a new pool, so catalog updates or an empty refreshed pool do not replace an active puzzle. A stale Daily guess is rejected using its `If-Match` session ID.
 
 Unlimited chooses a random eligible target, avoiding the visitor's 20 most recent targets when the collection allows it. Difficulty combines complete metadata, actor/director connections and a popularity proxy. It is not an audience rating or a guarantee that a film is easy to recognize.
 
@@ -46,3 +46,5 @@ An HttpOnly cookie identifies an anonymous visitor. The browser stores language,
 The API loads and validates the catalog at startup. Search and comparison operate on this in-memory catalog; PostgreSQL stores durable game state. Multiple API instances must share the database, catalog and Daily secret. Mutation rate counters are shared through PostgreSQL.
 
 Movie-provider credentials remain server-side. Media lookups are optional, have bounded concurrency and timeouts, and do not prevent gameplay. See [data and media](DATA.md) for caching and attribution, and [deployment](DEPLOYMENT.md) for public hosting.
+
+Genre relationships include both base genres and curated `subgenre:` entities. The catalog loader separates them for the engine. `movie.genre_profile` stores a versioned historical genre snapshot for compatibility with game targets saved before a taxonomy update; it is not used as the current genre relationship source.

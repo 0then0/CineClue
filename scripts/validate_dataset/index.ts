@@ -1,11 +1,17 @@
 import { Catalog } from "../../apps/api/src/catalog.ts";
+import { readDailyPool } from "../../apps/api/src/daily.ts";
 import { pool } from "../../apps/api/src/db.ts";
 import { readMediaSnapshot } from "../../apps/api/src/media.ts";
 import { readSnapshot } from "../import_movies/snapshot.ts";
 
 const { movies, packs } = await readSnapshot();
 if (new Set(movies.map((m) => m.id)).size !== movies.length) throw new Error("Duplicate movie IDs");
-const catalog = new Catalog(movies, packs);
+const dailyVotes = await readDailyPool();
+const catalog = new Catalog(movies, packs, dailyVotes);
+for (const id of dailyVotes.keys())
+  if (!catalog.byId.has(id)) throw new Error(`Unknown Daily film ${id}`);
+if (!catalog.dailyCandidates().length) throw new Error("Empty Daily pool");
+console.log(`Daily: ${catalog.dailyCandidates().length} popular, connected targets`);
 if (new Set(catalog.packs.map((pack) => pack.id)).size !== catalog.packs.length)
   throw new Error("Duplicate collection IDs");
 for (const pack of catalog.packs) {

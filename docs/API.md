@@ -33,8 +33,8 @@ Closing a chooser does not spend a use. A kind with insufficient source data is 
 
 ## Catalog and media
 
-- `GET /movies/search?q=...` returns `{ "movies": [...] }` with up to ten public film references. Queries contain 2–160 characters.
-- `GET /packs` returns localized collections, eligible counts by `easy`/`normal`/`hard`, catalog size and data-source identifiers. A collection's `count` is its hard-difficulty target count. Counts describe playable targets rather than all searchable films.
+- `GET /movies/search?q=...` returns `{ "movies": [...] }` with up to ten public film references. Queries contain 2–160 characters. Exact titles, title prefixes and exact phrases rank first, followed by titles matching all meaningful query words regardless of order or common Russian/English function words. The final word may be incomplete. Fuzzy character matching remains a fallback for typos. Each translation and alias is matched independently; popularity breaks relevance ties.
+- `GET /packs` returns localized collections, eligible counts by `easy`/`normal`/`hard`, catalog size and data-source identifiers. A collection's `count` is its hard-difficulty target count. Counts describe playable targets rather than all searchable films. Collection categories include `genre`, `country`, `era` and `director` (`all` for the complete catalog). Country rules match any production country in `countryIds`, including co-productions.
 - `GET /media/{movie_id}` returns optional poster, portrait and studio-logo metadata (keyed by canonical entity ID), plus country ISO codes for a known film. Provider credentials are never included.
 - `GET /health` checks database connectivity and reports catalog size.
 
@@ -68,3 +68,7 @@ Errors use `{ "error": "code" }`:
 - **503:** `catalog_unavailable`.
 
 Internal stack traces are logged server-side and are not returned to clients.
+
+## Genre comparisons
+
+The genre cell compares base TMDB genres. New comparison objects can include `genres.subgenres` with only the guessed film's curated subgenres and matching values, plus `genres.subgenresComparable`. A false value means there is insufficient data for comparison, not a confirmed difference. Subgenres do not alter the seven-cell share format. Older stored comparisons remain valid without these optional fields.

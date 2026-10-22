@@ -1,5 +1,6 @@
-import { createHmac, randomInt } from "node:crypto";
+import { randomInt } from "node:crypto";
 import type { PoolClient } from "pg";
+import { normalizeCountry } from "../../../packages/game-engine/src/countries.ts";
 import { createHint, hintAllowance } from "../../../packages/game-engine/src/hints.ts";
 import {
   compareMovies,
@@ -13,6 +14,10 @@ import {
   publicMovie,
 } from "../../../packages/game-engine/src/index.ts";
 import type { Catalog } from "./catalog.ts";
+import { selectDaily } from "./daily.ts";
+
+export { dailyIndex } from "./daily.ts";
+
 import { pool } from "./db.ts";
 export class ApiError extends Error {
   readonly status: number;
@@ -26,12 +31,6 @@ export class ApiError extends Error {
 export const utcDate = (date = new Date()) => date.toISOString().slice(0, 10);
 export const nextMidnight = (date: string) =>
   new Date(Date.parse(`${date}T00:00:00Z`) + 86400000).toISOString();
-export function dailyIndex(date: string, secret: string, count: number) {
-  return Number(
-    BigInt(`0x${createHmac("sha256", secret).update(`cineclue:v1:${date}`).digest("hex")}`) %
-      BigInt(count),
-  );
-}
 export class Games {
   readonly catalog: Catalog;
   readonly secret: string;
@@ -41,19 +40,40 @@ export class Games {
   }
   async daily(visitor: string): Promise<GameView> {
     const date = utcDate();
-    const candidates = this.catalog.candidates("normal");
-    if (!candidates.length) throw new ApiError(503, "no_candidates");
-    const target = candidates[dailyIndex(date, this.secret, candidates.length)];
-    await pool.query(
-      "INSERT INTO daily_puzzle(puzzle_date,target_id,target_snapshot) VALUES($1,$2,$3) ON CONFLICT(puzzle_date) DO NOTHING",
-      [date, target.id, JSON.stringify(target)],
-    );
-    const puzzle = (
+    let puzzle = (
       await pool.query(
         "SELECT id,target_id,target_snapshot FROM daily_puzzle WHERE puzzle_date=$1",
         [date],
       )
     ).rows[0];
+    if (!puzzle) {
+      const history = (
+        await pool.query(
+          "SELECT to_char(puzzle_date,'YYYY-MM-DD') date,target_id,target_snapshot FROM daily_puzzle WHERE puzzle_date < $1::date AND puzzle_date >= $1::date - 180 ORDER BY puzzle_date DESC",
+          [date],
+        )
+      ).rows.map((r) => ({
+        date: r.date as string,
+        movieId: r.target_id as string,
+        directorIds:
+          (r.target_snapshot
+            ? movieSchema.parse(r.target_snapshot)
+            : this.catalog.byId.get(r.target_id)
+          )?.directors.map((d) => d.id) ?? [],
+      }));
+      const target = selectDaily(this.catalog.dailyCandidates(), history, date, this.secret);
+      if (!target) throw new ApiError(503, "no_candidates");
+      await pool.query(
+        "INSERT INTO daily_puzzle(puzzle_date,target_id,target_snapshot) VALUES($1,$2,$3) ON CONFLICT(puzzle_date) DO NOTHING",
+        [date, target.id, JSON.stringify(target)],
+      );
+      puzzle = (
+        await pool.query(
+          "SELECT id,target_id,target_snapshot FROM daily_puzzle WHERE puzzle_date=$1",
+          [date],
+        )
+      ).rows[0];
+    }
     await pool.query(
       "INSERT INTO game_session(visitor_id,mode,puzzle_id,target_id,target_snapshot) VALUES($1,'daily',$2,$3,$4) ON CONFLICT(visitor_id,puzzle_id) DO NOTHING",
       [
@@ -125,12 +145,23 @@ export class Games {
     ).rows.map((g) => {
       const m = this.catalog.byId.get(g.movie_id);
       if (!m) throw new Error("Catalog missing guess");
-      return { movie: publicMovie(m), comparison: g.comparison };
+      return {
+        movie: publicMovie(m),
+        comparison: {
+          ...g.comparison,
+          countries: {
+            ...g.comparison.countries,
+            values: g.comparison.countries.values.map(normalizeCountry),
+            matches: g.comparison.countries.matches.map(normalizeCountry),
+          },
+        },
+      };
     });
-    const target = s.target_snapshot
+    const savedTarget = s.target_snapshot
       ? movieSchema.parse(s.target_snapshot)
       : this.catalog.byId.get(s.target_id);
-    if (!target) throw new ApiError(503, "catalog_unavailable");
+    if (!savedTarget) throw new ApiError(503, "catalog_unavailable");
+    const target = { ...savedTarget, countries: savedTarget.countries.map(normalizeCountry) };
     const used: GameHint[] = (
       await client.query("SELECT content FROM game_hint WHERE game_id=$1 ORDER BY ordinal", [id])
     ).rows.map((r) => r.content);

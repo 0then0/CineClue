@@ -138,7 +138,7 @@ it("keeps obscure connected films searchable but out of easy and normal target p
   expect(catalog.candidates("hard").some((m) => m.id === "film0")).toBe(true);
 });
 
-it("enriches only cast and provenance while preserving seed identities and facts", async () => {
+it("enriches cast and genre profiles while preserving other seed facts", async () => {
   const original = await movie("Qoriginal");
   const before = structuredClone(original);
   const enriched = enrichSeedCast(
@@ -218,3 +218,28 @@ it("publishes attributed image metadata with canonical people and country IDs", 
   expect(media.countries.Q30).toBe("US");
   expect(media.people.Q1.url).toContain("image.tmdb.org");
 });
+
+it.each([
+  ["SU", "Soviet Union", "СССР"],
+  ["DD", "East Germany", "ГДР"],
+  ["YU", "Yugoslavia", "Югославия"],
+  ["CS", "Serbia and Montenegro", "Сербия и Черногория"],
+  ["CS", "Czechoslovakia", "Чехословакия"],
+])(
+  "imports historical country %s with its original identity and Russian name",
+  async (code, name, ru) => {
+    const result = await normalizeExpanded(
+      { ...raw, production_countries: [{ iso_3166_1: code, name }] },
+      candidate,
+      {
+        ...identities,
+        identities: { ...identities.identities, [`iso:${code}`]: "Q159" },
+        entities: {
+          ...identities.entities,
+          Q159: { id: "Q159", name: "Russia", names: { en: "Russia", ru: "Россия" } },
+        },
+      },
+    );
+    expect(result.countries).toEqual([{ id: `iso:${code}`, name, names: { en: name, ru } }]);
+  },
+);

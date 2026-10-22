@@ -2216,58 +2216,58 @@
       "hard": 772
     },
     "action": {
-      "easy": 1441,
-      "normal": 2284,
-      "hard": 2348
+      "easy": 1372,
+      "normal": 2215,
+      "hard": 2280
     },
     "adventure": {
-      "easy": 974,
-      "normal": 1500,
-      "hard": 1568
+      "easy": 1048,
+      "normal": 1574,
+      "hard": 1642
     },
     "comedy": {
-      "easy": 1708,
-      "normal": 3375,
-      "hard": 3506
+      "easy": 1664,
+      "normal": 3330,
+      "hard": 3461
     },
     "drama": {
-      "easy": 2098,
-      "normal": 4159,
-      "hard": 4408
+      "easy": 2006,
+      "normal": 4069,
+      "hard": 4317
     },
     "scifi": {
-      "easy": 767,
-      "normal": 1212,
-      "hard": 1267
+      "easy": 759,
+      "normal": 1204,
+      "hard": 1259
     },
     "fantasy": {
-      "easy": 715,
-      "normal": 1119,
-      "hard": 1188
+      "easy": 646,
+      "normal": 1050,
+      "hard": 1119
     },
     "horror": {
-      "easy": 678,
-      "normal": 1329,
-      "hard": 1475
+      "easy": 651,
+      "normal": 1301,
+      "hard": 1447
     },
     "thriller": {
-      "easy": 1419,
-      "normal": 2547,
-      "hard": 2649
+      "easy": 1448,
+      "normal": 2579,
+      "hard": 2682
     },
     "crime": {
-      "easy": 847,
-      "normal": 1519,
-      "hard": 1569
+      "easy": 856,
+      "normal": 1527,
+      "hard": 1578
     },
     "mystery": {
-      "easy": 495,
-      "normal": 868,
-      "hard": 917
+      "easy": 484,
+      "normal": 859,
+      "hard": 908
     },
     "romance": {
-      "easy": 778,
-      "normal": 1574,
+      "easy": 776,
+      "normal": 1573,
       "hard": 1642
     },
     "superheroes": {
@@ -2281,9 +2281,9 @@
       "hard": 101
     },
     "war": {
-      "easy": 164,
-      "normal": 319,
-      "hard": 348
+      "easy": 148,
+      "normal": 305,
+      "hard": 336
     },
     "classics": {
       "easy": 183,
@@ -2349,6 +2349,76 @@
       "easy": 12,
       "normal": 12,
       "hard": 12
+    },
+    "country-russia-ussr": {
+      "easy": 19,
+      "normal": 246,
+      "hard": 317
+    },
+    "country-usa": {
+      "easy": 4274,
+      "normal": 7010,
+      "hard": 7161
+    },
+    "country-uk": {
+      "easy": 805,
+      "normal": 1419,
+      "hard": 1456
+    },
+    "country-france": {
+      "easy": 459,
+      "normal": 1113,
+      "hard": 1193
+    },
+    "country-germany": {
+      "easy": 303,
+      "normal": 577,
+      "hard": 612
+    },
+    "country-italy": {
+      "easy": 150,
+      "normal": 469,
+      "hard": 496
+    },
+    "country-spain": {
+      "easy": 97,
+      "normal": 236,
+      "hard": 259
+    },
+    "country-japan": {
+      "easy": 146,
+      "normal": 338,
+      "hard": 380
+    },
+    "country-south-korea": {
+      "easy": 40,
+      "normal": 99,
+      "hard": 119
+    },
+    "country-china": {
+      "easy": 88,
+      "normal": 151,
+      "hard": 163
+    },
+    "country-india": {
+      "easy": 41,
+      "normal": 68,
+      "hard": 76
+    },
+    "country-canada": {
+      "easy": 263,
+      "normal": 527,
+      "hard": 543
+    },
+    "country-australia": {
+      "easy": 115,
+      "normal": 211,
+      "hard": 216
     }
+  },
+  "genres": {
+    "version": 1,
+    "baseGenres": 19,
+    "filmsWithSubgenres": 573
   }
 }

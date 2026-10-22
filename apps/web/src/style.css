@@ -395,40 +395,6 @@ h1 {
   font-size: 13px;
   color: var(--muted);
 }
-.legend {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 20px;
-  padding: 0 18px 22px;
-  font-size: 10px;
-  color: var(--muted);
-  border-bottom: 1px solid var(--line);
-}
-.legend .exact {
-  color: var(--ink);
-}
-.legend .partial {
-  color: var(--ink);
-}
-.legend span:before {
-  content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border: 1px solid #869aac;
-  background: var(--miss);
-  margin-right: 5px;
-  border-radius: 2px;
-}
-.legend .exact:before {
-  background: var(--exact);
-  border-color: var(--exact-border);
-}
-.legend .partial:before {
-  background: var(--partial);
-  border-color: #a8974e;
-}
 .empty-state {
   text-align: center;
   min-height: 285px;
@@ -589,7 +555,7 @@ h1 {
 .below-game {
   display: flex;
   gap: 35px;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 23px 2px 40px;
   color: var(--muted);
 }
@@ -936,10 +902,6 @@ footer {
   .empty-clues span {
     font-size: 9px;
     padding: 6px 2px;
-  }
-  .legend {
-    gap: 10px;
-    font-size: 9px;
   }
   .below-game {
     gap: 20px;
@@ -2049,4 +2011,78 @@ footer .catalog-credit {
 }
 .challenge-movie > .media-credits {
   grid-column: 1 / -1;
+}
+
+.genre-subgenres {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  color: var(--ink);
+}
+.genre-subgenres h4 {
+  margin: 0 0 4px;
+  font-size: 10px;
+}
+.genre-subgenres small {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 9px;
+}
+
+.utility-button.help-button {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--miss);
+}
+.help-dialog {
+  width: min(640px, calc(100% - 32px));
+  line-height: 1.6;
+}
+.help-dialog section {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--miss);
+}
+.help-dialog section h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+.help-dialog section p {
+  margin: 8px 0 0;
+}
+.help-color-guide {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.help-color-guide li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+.help-swatch {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+
+.help-swatch.exact {
+  background: var(--exact);
+  border-color: var(--success);
+}
+.help-swatch.close {
+  background: var(--partial);
+}
+.help-swatch.miss {
+  background: var(--paper);
 }

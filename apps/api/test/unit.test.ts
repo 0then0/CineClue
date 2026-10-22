@@ -1,7 +1,10 @@
+import { readFileSync } from "node:fs";
 import { expect, it, vi } from "vitest";
+import { compareMovies } from "../../../packages/game-engine/src/index.ts";
 import type { Movie } from "../../../packages/game-engine/src/model.ts";
-import { Catalog } from "../src/catalog.ts";
-import { dailyIndex, nextMidnight, utcDate } from "../src/game.ts";
+import { Catalog, inPack, packSchema } from "../src/catalog.ts";
+import { readDailyPool, selectDaily } from "../src/daily.ts";
+import { dailyIndex, Games, nextMidnight, utcDate } from "../src/game.ts";
 
 it("uses UTC and derives stable daily choices from a secret", () => {
   expect(utcDate(new Date("2026-10-22T01:59:00+03:00"))).toBe("2026-10-21");
@@ -243,4 +246,163 @@ it("falls back to licensed Commons studio logos even when poster and cast are co
   } finally {
     fetcher.mockRestore();
   }
+});
+
+it("requires verified audience and complete, connected clues for Daily independently of legacy popularity scores", () => {
+  const entity = { id: "e", name: "Entity", names: {} };
+  const complete = {
+    ...mediaMovie(),
+    actors: [entity, { ...entity, id: "a2" }, { ...entity, id: "a3" }],
+    genres: [entity],
+    studios: [entity],
+    popularityScore: 5,
+  };
+  const movies = Array.from({ length: 14 }, (_, i) => ({ ...complete, id: `connected-${i}` }));
+  const badCast = { ...complete, id: "bad-cast", actors: [entity] };
+  const badStudio = { ...complete, id: "bad-studio", studios: [] };
+  const isolated = {
+    ...complete,
+    id: "isolated",
+    directors: [{ ...entity, id: "solo-director" }],
+    actors: ["x", "y", "z"].map((id) => ({ ...entity, id })),
+  };
+  const obscure = { ...complete, id: "obscure", popularityScore: 100 };
+  const all = [...movies, badCast, badStudio, isolated, obscure];
+  const votes = new Map(all.map((m) => [m.id, m.id === "obscure" ? 4999 : 5000]));
+  const catalog = new Catalog(all, [], votes);
+  expect(catalog.dailyCandidates().map((m) => m.id)).toEqual(
+    movies.map((m) => m.id).sort((a, b) => a.localeCompare(b)),
+  );
+  expect(new Catalog(all, []).dailyCandidates()).toEqual([]);
+});
+
+it("keeps recognizable classics and blockbusters in the separate Daily pool", async () => {
+  const { movies, packs } = JSON.parse(readFileSync("data/catalog.json", "utf8"));
+  const catalog = new Catalog(movies, packs, await readDailyPool());
+  const ids = new Set(catalog.dailyCandidates().map((m) => m.id));
+  expect(ids.size).toBeGreaterThan(365);
+  for (const id of ["Q83495", "Q25188", "Q134773", "Q47703", "Q483815"])
+    expect(ids.has(id), id).toBe(true);
+});
+it("avoids Daily repeats for 180 days and directors for seven days when alternatives exist", () => {
+  const a = { ...mediaMovie(), id: "a" };
+  const b = { ...a, id: "b" };
+  const c = { ...a, id: "c", directors: [{ id: "other", name: "Other", names: {} }] };
+  const recent = [{ date: "2026-10-21", movieId: "a", directorIds: ["Q2"] }];
+  expect(selectDaily([a, b, c], recent, "2026-10-22", "secret")?.id).toBe("c");
+  expect(selectDaily([a, b], recent, "2026-10-22", "secret")?.id).toBe("b");
+  expect(selectDaily([a], [{ ...recent[0], date: "2026-04-25" }], "2026-10-22", "secret")).toBe(a);
+});
+it("chooses deterministically regardless of catalog/history order and ignores future history", () => {
+  const movies = ["a", "b", "c"].map((id) => ({ ...mediaMovie(), id }));
+  const recent = [{ date: "2026-10-23", movieId: "b", directorIds: ["Q2"] }];
+  expect(selectDaily(movies, recent, "2026-10-22", "secret")).toEqual(
+    selectDaily([...movies].reverse(), [], "2026-10-22", "secret"),
+  );
+  expect(selectDaily([], [], "2026-10-22", "secret")).toBeUndefined();
+});
+it("uses the least recently featured popular film when a small Daily pool is exhausted", () => {
+  const movies = ["a", "b"].map((id) => ({ ...mediaMovie(), id }));
+  const history = [
+    { date: "2026-10-21", movieId: "a", directorIds: [] },
+    { date: "2026-10-20", movieId: "b", directorIds: [] },
+    { date: "2026-10-19", movieId: "a", directorIds: [] },
+  ];
+  expect(selectDaily(movies, history, "2026-10-22", "secret")?.id).toBe("b");
+  expect(selectDaily([movies[0]], history, "2026-10-22", "secret")?.id).toBe("a");
+});
+
+it("keeps a full year of Daily choices popular and varied without repeats in the 180-day window", async () => {
+  const { movies, packs } = JSON.parse(readFileSync("data/catalog.json", "utf8"));
+  const catalog = new Catalog(movies, packs, await readDailyPool());
+  const candidates = catalog.dailyCandidates();
+  const history: { date: string; movieId: string; directorIds: string[] }[] = [];
+  for (let day = 0; day < 365; day++) {
+    const date = utcDate(new Date(Date.UTC(2027, 0, 1 + day)));
+    const chosen = selectDaily(candidates, history, date, "year-simulation");
+    expect(chosen).toBeDefined();
+    if (!chosen) throw new Error("Missing Daily");
+    expect(history.slice(-180).some((r) => r.movieId === chosen.id)).toBe(false);
+    const directors = new Set(history.slice(-7).flatMap((r) => r.directorIds));
+    expect(chosen.directors.some((d) => directors.has(d.id))).toBe(false);
+    history.push({ date, movieId: chosen.id, directorIds: chosen.directors.map((d) => d.id) });
+  }
+});
+it("applies the exact 180-day repeat boundary", () => {
+  const movies = ["a", "b"].map((id) => ({ ...mediaMovie(), id }));
+  const date = "2026-10-22";
+  const history = [{ date: "2026-04-25", movieId: "a", directorIds: [] }];
+  expect(selectDaily(movies, history, date, "secret")?.id).toBe("b");
+  expect(selectDaily(movies, [{ ...history[0], date: "2026-04-24" }], date, "secret")).toEqual(
+    selectDaily(movies, [], date, "secret"),
+  );
+});
+
+it("combines Russia and USSR by country identity and includes co-productions without admitting unrelated films", () => {
+  const rules = { countryIds: ["Q159", "Q15180", "iso:RU", "iso:SU"] };
+  const pack = packSchema.parse({
+    id: "country-russia-ussr",
+    name: { en: "Russia & USSR" },
+    description: {},
+    rules,
+  });
+  const base = mediaMovie();
+  for (const id of rules.countryIds) {
+    expect(inPack({ ...base, countries: [{ id, name: "Country", names: {} }] }, pack)).toBe(true);
+  }
+  expect(
+    inPack(
+      { ...base, countries: [...base.countries, { id: "Q159", name: "Russia", names: {} }] },
+      pack,
+    ),
+  ).toBe(true);
+  expect(inPack(base, pack)).toBe(false);
+  expect(inPack({ ...base, countries: [] }, pack)).toBe(false);
+  expect(
+    inPack(
+      { ...base, releaseYear: 1980, countries: [{ id: "Q15180", name: "USSR", names: {} }] },
+      { ...pack, rules: { ...rules, yearMin: 1991 } },
+    ),
+  ).toBe(false);
+});
+
+it("corrects saved country labels in API guesses and answers without rewriting snapshots or comparison results", async () => {
+  const movie: Movie = {
+    ...JSON.parse(readFileSync("data/catalog.json", "utf8")).movies[0],
+    countries: [
+      { id: "iso:SU", name: "Soviet Union", names: { en: "Soviet Union", ru: "Россия" } },
+    ],
+  };
+  const comparison = compareMovies(movie, movie);
+  const original = structuredClone({ movie, comparison });
+  const query = vi
+    .fn()
+    .mockResolvedValueOnce({
+      rows: [
+        {
+          id: "saved",
+          mode: "unlimited",
+          date: null,
+          status: "won",
+          difficulty: "normal",
+          target_id: movie.id,
+          target_snapshot: movie,
+        },
+      ],
+    })
+    .mockResolvedValueOnce({ rows: [{ movie_id: movie.id, comparison }] })
+    .mockResolvedValueOnce({ rows: [] });
+  const client = { query } as unknown as NonNullable<Parameters<Games["view"]>[2]>;
+  const result = await new Games(new Catalog([movie], []), "secret").view(
+    "saved",
+    "visitor",
+    client,
+  );
+  expect(result.answer?.countries[0].names.ru).toBe("СССР");
+  expect(result.guesses[0].comparison.countries.values[0].names.ru).toBe("СССР");
+  expect(result.guesses[0].comparison.countries.matches[0].names.ru).toBe("СССР");
+  expect(result.guesses[0].comparison.countries.status).toBe(comparison.countries.status);
+  expect(result.guesses[0].comparison.runtime).toEqual(comparison.runtime);
+  expect({ movie, comparison }).toEqual(original);
+  expect(query.mock.calls.every(([sql]) => sql.startsWith("SELECT"))).toBe(true);
 });

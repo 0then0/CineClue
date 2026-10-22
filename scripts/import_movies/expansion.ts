@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { tmdbImage } from "../../apps/api/src/media.ts";
 import {
+  historicalCountryCodes,
+  normalizeCountry,
+} from "../../packages/game-engine/src/countries.ts";
+import { applyGenreProfile } from "../../packages/game-engine/src/genres.ts";
+import {
   type Entity,
   type Movie,
   type MovieMedia,
@@ -52,6 +57,9 @@ export async function normalizeExpanded(
   ]);
   if (!normalized || normalized.actors.length < 3) throw new Error("incomplete_cast");
   const canonical = (entity: Entity): Entity => {
+    const sourceCountryCode = entity.id.match(/^iso:([A-Z]{2})$/)?.[1];
+    if (sourceCountryCode && historicalCountryCodes.has(sourceCountryCode))
+      return normalizeCountry(entity);
     const id = data.identities[entity.id] ?? entity.id;
     const known = data.entities[id];
     const country = entity.id.match(/^iso:([A-Z]{2})$/)?.[1];
@@ -78,7 +86,10 @@ export async function normalizeExpanded(
       ).values(),
     ];
   if (normalized.actors.length < 3) throw new Error("incomplete_canonical_cast");
-  return movieSchema.parse({ ...normalized, popularityScore: popularity(candidate.vote_count) });
+  return applyGenreProfile(
+    movieSchema.parse({ ...normalized, popularityScore: popularity(candidate.vote_count) }),
+    raw,
+  );
 }
 export function selectExpanded(
   base: Movie[],
@@ -160,7 +171,7 @@ export function enrichSeedCast(
     ).values(),
   ].slice(0, 5);
   if (actors.length < 3) throw new Error(`Insufficient credited cast for ${base.id}`);
-  return movieSchema.parse({
+  const enriched = movieSchema.parse({
     ...base,
     actors,
     provenance: [
@@ -173,6 +184,7 @@ export function enrichSeedCast(
       },
     ],
   });
+  return (raw as Record<string, unknown>).genres ? applyGenreProfile(enriched, raw) : enriched;
 }
 
 export function importedMedia(raw: unknown, movie: Movie, data: IdentityData) {

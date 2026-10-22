@@ -1,3 +1,4 @@
+import { countryKey } from "./countries.ts";
 import type { Comparison, Entity, Movie, NumericResult, SetResult } from "./model.ts";
 
 export * from "./model.ts";
@@ -10,10 +11,14 @@ export function compareNumber(guess: number, target: number, close: number): Num
     direction: delta === 0 ? null : delta > 0 ? "higher" : "lower",
   };
 }
-export function compareSet(guess: Entity[], target: Entity[]): SetResult {
-  const targetIds = new Set(target.map((x) => x.id));
-  const unique = [...new Map(guess.map((x) => [x.id, x])).values()];
-  const matches = unique.filter((x) => targetIds.has(x.id));
+export function compareSet(
+  guess: Entity[],
+  target: Entity[],
+  key: (entity: Entity) => string = (entity) => entity.id,
+): SetResult {
+  const targetIds = new Set(target.map(key));
+  const unique = [...new Map(guess.map((x) => [key(x), x])).values()];
+  const matches = unique.filter((x) => targetIds.has(key(x)));
   return {
     values: unique,
     matches,
@@ -34,9 +39,19 @@ export function compareMovies(
     year: compareNumber(guess.releaseYear, target.releaseYear, thresholds.year),
     runtime: compareNumber(guess.runtime, target.runtime, thresholds.runtime),
     directors: compareSet(guess.directors, target.directors),
-    genres: compareSet(guess.genres, target.genres),
+    genres: target.genreProfile
+      ? {
+          ...compareSet(guess.genres, target.genres),
+          ...(guess.subgenres?.length
+            ? {
+                subgenres: compareSet(guess.subgenres, target.subgenres ?? []),
+                subgenresComparable: !!target.subgenres?.length,
+              }
+            : {}),
+        }
+      : compareSet(guess.genreProfile?.legacy ?? guess.genres, target.genres),
     actors: compareSet(guess.actors, target.actors),
-    countries: compareSet(guess.countries, target.countries),
+    countries: compareSet(guess.countries, target.countries, countryKey),
     studios: compareSet(guess.studios, target.studios),
   };
 }

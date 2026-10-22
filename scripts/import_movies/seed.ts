@@ -60,6 +60,10 @@ try {
         JSON.stringify(m.provenance),
       ],
     );
+    await client.query("UPDATE movie SET genre_profile=$2 WHERE id=$1", [
+      m.id,
+      m.genreProfile ? JSON.stringify(m.genreProfile) : null,
+    ]);
     await client.query("DELETE FROM alias WHERE movie_id=$1", [m.id]);
     for (const name of m.aliases)
       await client.query("INSERT INTO alias VALUES($1,$2) ON CONFLICT DO NOTHING", [m.id, name]);
@@ -82,7 +86,7 @@ try {
       }
     }
     for (const [table, values] of [
-      ["genre", m.genres],
+      ["genre", [...m.genres, ...(m.subgenres ?? [])]],
       ["country", m.countries],
       ["studio", m.studios],
     ] as const) {

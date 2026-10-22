@@ -106,7 +106,7 @@ try {
   await mapConcurrent([...candidates.values()], async (candidate) => {
     try {
       const value = await client.get(`movie/${candidate.id}`, {
-        append_to_response: "credits,translations,alternative_titles,external_ids",
+        append_to_response: "credits,translations,alternative_titles,keywords,external_ids",
         language: "en-US",
       });
       const line = `${JSON.stringify(value)}\n`;

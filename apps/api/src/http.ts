@@ -187,11 +187,13 @@ export function app(
             category:
               p.id === "popular"
                 ? "all"
-                : p.rules.directorIds
-                  ? "director"
-                  : p.rules.yearMin || p.rules.yearMax
-                    ? "era"
-                    : "genre",
+                : p.rules.countryIds
+                  ? "country"
+                  : p.rules.directorIds
+                    ? "director"
+                    : p.rules.yearMin || p.rules.yearMax
+                      ? "era"
+                      : "genre",
           })),
           catalogSize: catalog.movies.length,
           dataSources: catalog.sources,

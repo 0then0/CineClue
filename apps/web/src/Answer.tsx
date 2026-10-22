@@ -1,4 +1,6 @@
+import { countryName } from "../../../packages/game-engine/src/countries.ts";
 import type { Movie } from "../../../packages/game-engine/src/model.ts";
+import { countryCode } from "./countries.ts";
 import { type Locale, type Messages, titleOf } from "./i18n.ts";
 import { flag, MediaCredits, MediaPicture, StudioLogo, useMovieMedia } from "./Media.tsx";
 
@@ -21,12 +23,18 @@ export function Answer({ movie, locale, t }: { movie: Movie; locale: Locale; t: 
           <p>
             <b>{t.genres}:</b> {movie.genres.map((e) => e.names[locale] ?? e.name).join(", ")}
           </p>
+          {!!movie.subgenres?.length && (
+            <p>
+              <b>{t.subgenres}:</b>{" "}
+              {movie.subgenres.map((e) => e.names[locale] ?? e.name).join(", ")}
+            </p>
+          )}
           <p className="answer-countries">
             <b>{t.countries}:</b>{" "}
             {movie.countries.map((e) => (
               <span key={e.id}>
-                <span aria-hidden="true">{flag(media.countries[e.id])}</span>{" "}
-                {e.names[locale] ?? e.name}
+                <span aria-hidden="true">{flag(countryCode(e.id, media.countries[e.id]))}</span>{" "}
+                {countryName(e, locale)}
               </span>
             ))}
           </p>

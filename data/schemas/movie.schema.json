@@ -66,6 +66,11 @@
             "additionalProperties": {
               "type": "string"
             }
+          },
+          "frequency": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
           }
         },
         "required": ["id", "name", "names"],
@@ -96,11 +101,95 @@
             "additionalProperties": {
               "type": "string"
             }
+          },
+          "frequency": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
           }
         },
         "required": ["id", "name", "names"],
         "additionalProperties": false
       }
+    },
+    "subgenres": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "names": {
+            "default": {},
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "frequency": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": ["id", "name", "names"],
+        "additionalProperties": false
+      }
+    },
+    "genreProfile": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "number",
+          "const": 1
+        },
+        "legacy": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "names": {
+                "default": {},
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "frequency": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": ["id", "name", "names"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["version", "legacy"],
+      "additionalProperties": false
     },
     "directors": {
       "minItems": 1,
@@ -126,6 +215,11 @@
             "additionalProperties": {
               "type": "string"
             }
+          },
+          "frequency": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
           }
         },
         "required": ["id", "name", "names"],
@@ -157,6 +251,11 @@
             "additionalProperties": {
               "type": "string"
             }
+          },
+          "frequency": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
           }
         },
         "required": ["id", "name", "names"],
@@ -187,6 +286,11 @@
             "additionalProperties": {
               "type": "string"
             }
+          },
+          "frequency": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
           }
         },
         "required": ["id", "name", "names"],

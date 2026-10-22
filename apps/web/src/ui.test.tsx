@@ -162,6 +162,13 @@ it("groups film collections and shows counts for the selected difficulty", async
       category: "era",
     },
     {
+      id: "country-russia-ussr",
+      name: { en: "Russia & USSR" },
+      count: 317,
+      counts: { easy: 19, normal: 246, hard: 317 },
+      category: "country",
+    },
+    {
       id: "nolan",
       name: { en: "Nolan" },
       count: 10,
@@ -195,14 +202,18 @@ it("groups film collections and shows counts for the selected difficulty", async
   expect(screen.getByRole("group", { name: "Genres & themes" })).toBeTruthy();
   expect(screen.getByRole("group", { name: "Decades & eras" })).toBeTruthy();
   expect(screen.getByRole("group", { name: "Directors" })).toBeTruthy();
+  expect(screen.getByRole("group", { name: "Countries" })).toBeTruthy();
+  expect(screen.getByRole("option", { name: "Russia & USSR (246)" })).toBeTruthy();
   fireEvent.change(screen.getByRole("combobox", { name: "Difficulty" }), {
     target: { value: "easy" },
   });
   expect(screen.getByRole("option", { name: "Animation (5)" })).toBeTruthy();
+  expect(screen.getByRole("option", { name: "Russia & USSR (19)" })).toBeTruthy();
   fireEvent.change(screen.getByRole("combobox", { name: "Difficulty" }), {
     target: { value: "hard" },
   });
   expect(screen.getByRole("option", { name: "Animation (12)" })).toBeTruthy();
+  expect(screen.getByRole("option", { name: "Russia & USSR (317)" })).toBeTruthy();
 });
 
 it("celebrates a new winning guess but does not replay confetti on reload", async () => {

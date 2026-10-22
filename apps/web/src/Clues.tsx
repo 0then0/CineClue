@@ -1,3 +1,4 @@
+import { countryName } from "../../../packages/game-engine/src/countries.ts";
 import type {
   Entity,
   GameView,
@@ -6,6 +7,7 @@ import type {
   NumericResult,
   SetResult,
 } from "../../../packages/game-engine/src/model.ts";
+import { countryCode } from "./countries.ts";
 import { type Locale, type Messages, titleOf } from "./i18n.ts";
 import { flag, MediaCredits, MediaPicture, StudioLogo, useMovieMedia } from "./Media.tsx";
 import { clueKeys } from "./results.ts";
@@ -26,7 +28,8 @@ function EntityValue({
   locale: Locale;
   t: Messages;
 }) {
-  const name = entity.names[locale] ?? entity.name;
+  const name =
+    kind === "countries" ? countryName(entity, locale) : (entity.names[locale] ?? entity.name);
   const person = kind === "directors" || kind === "actors";
   return (
     <span
@@ -59,7 +62,7 @@ function EntityValue({
       )}
       {kind === "countries" && (
         <span className="country-flag" aria-hidden="true">
-          {flag(media.countries[entity.id] ?? entity.id.match(/^iso:([A-Z]{2})$/)?.[1])}
+          {flag(countryCode(entity.id, media.countries[entity.id]))}
         </span>
       )}
       {kind === "studios" && (
@@ -94,8 +97,30 @@ function Clue({
     : [...value.values].sort(
         (a, b) =>
           Number(value.matches.some((m) => m.id === b.id)) -
-          Number(value.matches.some((m) => m.id === a.id)),
+            Number(value.matches.some((m) => m.id === a.id)) ||
+          (kind === "genres" ? (a.frequency ?? Infinity) - (b.frequency ?? Infinity) : 0),
       );
+  const subgenres =
+    !numeric && "subgenres" in value ? (value.subgenres as SetResult | undefined) : undefined;
+  const comparable = !numeric && "subgenresComparable" in value && value.subgenresComparable;
+  const detailValues =
+    subgenres?.values.toSorted(
+      (a, b) =>
+        Number(subgenres.matches.some((m) => m.id === b.id)) -
+          Number(subgenres.matches.some((m) => m.id === a.id)) ||
+        (a.frequency ?? Infinity) - (b.frequency ?? Infinity),
+    ) ?? [];
+  const detailEntity = (e: Entity) => (
+    <EntityValue
+      key={e.id}
+      entity={e}
+      matched={!!comparable && !!subgenres?.matches.some((m) => m.id === e.id)}
+      kind="genres"
+      media={media}
+      locale={locale}
+      t={t}
+    />
+  );
   const more = values.length > limit;
   const entity = (e: Entity) => (
     <EntityValue
@@ -138,6 +163,23 @@ function Clue({
               </summary>
               <div className="entity-list expanded-entities">{values.slice(limit).map(entity)}</div>
             </details>
+          )}
+          {detailValues.length > 0 && (
+            <section className="genre-subgenres">
+              <h4>{t.subgenres}</h4>
+              <small>{comparable && subgenres ? t[subgenres.status] : t.noSubgenreData}</small>
+              <div className="entity-list">{detailValues.slice(0, 2).map(detailEntity)}</div>
+              {detailValues.length > 2 && (
+                <details className="clue-more">
+                  <summary aria-label={`${t.showAll}: ${t.subgenres}`}>
+                    +{detailValues.length - 2}
+                  </summary>
+                  <div className="entity-list expanded-entities">
+                    {detailValues.slice(2).map(detailEntity)}
+                  </div>
+                </details>
+              )}
+            </section>
           )}
         </>
       )}

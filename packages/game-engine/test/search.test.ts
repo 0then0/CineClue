@@ -36,3 +36,51 @@ describe("catalog search", () => {
     expect(search("a")).toEqual([]);
   });
 });
+
+describe("multi-word relevance", () => {
+  const catalog = JSON.parse(
+    readFileSync(new URL("../../../data/catalog.json", import.meta.url), "utf8"),
+  ).movies;
+  const searchCatalog = createSearch(catalog);
+  it.each([
+    "легенда о десяти",
+    "легенда десяти",
+    "десяти легенда",
+    "ЛЕГЕНДА О ДЕСЯ",
+    "legend of the ten",
+  ])("ranks Shang-Chi first for %s", (query) => {
+    expect(searchCatalog(query)[0]?.titles.ru).toBe("Шан-Чи и Легенда Десяти Колец");
+  });
+  it("preserves exact title priority over a longer title containing the same words", () => {
+    const base = movies[0];
+    const make = (id: string, title: string) => ({
+      ...base,
+      id,
+      title,
+      originalTitle: title,
+      titles: {},
+      aliases: [],
+    });
+    const result = createSearch([
+      make("long", "The Legend of the Ten Rings"),
+      make("exact", "Legend Ten"),
+    ])("legend ten");
+    expect(result.map((m) => m.id)).toEqual(["exact", "long"]);
+  });
+  it("does not combine query terms from different translations", () => {
+    const base = {
+      ...movies[0],
+      title: "UniqueAlpha",
+      originalTitle: "UniqueBeta",
+      titles: {},
+      aliases: [],
+    };
+    const relevant = {
+      ...base,
+      id: "relevant",
+      title: "The UniqueAlpha and UniqueBeta",
+      originalTitle: "Other",
+    };
+    expect(createSearch([base, relevant])("uniquealpha uniquebeta")[0]?.id).toBe("relevant");
+  });
+});

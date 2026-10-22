@@ -6,6 +6,7 @@ import {
   type Movie,
   publicMovie,
 } from "../../../packages/game-engine/src/index.ts";
+import App from "./App.tsx";
 import { Clues } from "./Clues.tsx";
 import { Hints } from "./Hints.tsx";
 import { dictionaries } from "./i18n.ts";
@@ -183,6 +184,10 @@ it("locks hints before three misses and shows saved clues without reopening afte
     />,
   );
   expect(screen.getByText("1990–е")).toBeTruthy();
+  expect(
+    screen.getByRole("button", { name: "Подсказки Использовано: 1 / 2" }).hasAttribute("disabled"),
+  ).toBe(true);
+  expect(screen.getByText("Следующая подсказка после 7 промахов")).toBeTruthy();
   expect(screen.queryByRole("dialog")).toBeNull();
 });
 it("offers the second hint after seven misses and marks a used category as disabled", () => {
@@ -230,3 +235,115 @@ it("explicit Play resumes tips while the control retains focus and pointer", () 
   act(() => vi.advanceTimersByTime(TIP_INTERVAL_MS));
   expect(screen.getByText(dictionaries.en.tipMatchesTitle)).toBeTruthy();
 });
+
+it("counts both used hints even when no further hint is available", () => {
+  render(
+    <Hints
+      game={{
+        ...game,
+        hints: {
+          ...game.hints,
+          unlocked: 2,
+          remaining: 0,
+          nextUnlock: null,
+          used: [
+            { kind: "decade", decade: 1990 },
+            { kind: "genres", values: [] },
+          ],
+        },
+      }}
+      locale="en"
+      t={dictionaries.en}
+      pending={false}
+      onUse={vi.fn()}
+    />,
+  );
+  expect(screen.getByRole("button", { name: "Hints Used: 2 / 2" }).hasAttribute("disabled")).toBe(
+    true,
+  );
+  expect(screen.getByText("Hints available: 0")).toBeTruthy();
+});
+
+it.each(["en", "ru"] as const)(
+  "opens localized rules from the header and removes the bottom disclosure (%s)",
+  async (locale) => {
+    localStorage.setItem("cineclue:locale", JSON.stringify(locale));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((url: string) =>
+        Promise.resolve(
+          new Response(
+            JSON.stringify(url.endsWith("/packs") ? { packs: [], catalogSize: 10000 } : game),
+          ),
+        ),
+      ),
+    );
+    render(<App />);
+    const t = dictionaries[locale];
+    const header = screen.getByRole("banner");
+    fireEvent.click(within(header).getByRole("button", { name: t.help }));
+    const dialog = screen.getByRole("dialog", { name: t.help });
+    expect(within(dialog).getByText(t.helpText)).toBeTruthy();
+    expect(within(dialog).getByText(t.hintsLockedText)).toBeTruthy();
+    expect(within(dialog).getByText(t.helpNumbers)).toBeTruthy();
+    expect(
+      [...document.querySelectorAll("summary")].some((s) => s.textContent?.includes(t.help)),
+    ).toBe(false);
+    fireEvent.click(within(dialog).getByRole("button", { name: t.closeDialog }));
+    expect(screen.queryByRole("dialog", { name: t.help })).toBeNull();
+    fireEvent.click(within(header).getByRole("button", { name: t.help }));
+    const reopened = screen.getByRole("dialog", { name: t.help });
+    // Native Escape closes the dialog and fires close; verify the React state follows it.
+    fireEvent(reopened, new Event("close"));
+    expect(screen.queryByRole("dialog", { name: t.help })).toBeNull();
+  },
+);
+
+it.each(["stats", "help"] as const)(
+  "closes %s on backdrop click, but keeps content, padding and outward drags open",
+  async (kind) => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((url: string) =>
+        Promise.resolve(
+          new Response(
+            JSON.stringify(url.endsWith("/packs") ? { packs: [], catalogSize: 10000 } : game),
+          ),
+        ),
+      ),
+    );
+    localStorage.setItem("cineclue:locale", JSON.stringify("en"));
+    render(<App />);
+    const trigger = within(screen.getByRole("banner")).getByRole("button", {
+      name: dictionaries.en[kind],
+    });
+    fireEvent.click(trigger);
+    const dialog = screen.getByRole("dialog");
+    vi.spyOn(dialog, "getBoundingClientRect").mockReturnValue({
+      left: 100,
+      right: 500,
+      top: 100,
+      bottom: 500,
+      width: 400,
+      height: 400,
+      x: 100,
+      y: 100,
+      toJSON: () => ({}),
+    });
+    fireEvent.pointerDown(dialog, { clientX: 110, clientY: 110 });
+    fireEvent.click(dialog, { clientX: 110, clientY: 110 });
+    expect(screen.getByRole("dialog")).toBe(dialog);
+    const heading = within(dialog).getByRole("heading", { level: 2 });
+    fireEvent.pointerDown(heading, { clientX: 150, clientY: 150 });
+    fireEvent.click(heading, { clientX: 150, clientY: 150 });
+    expect(screen.getByRole("dialog")).toBe(dialog);
+    fireEvent.pointerDown(dialog, { clientX: 200, clientY: 200 });
+    fireEvent.click(dialog, { clientX: 50, clientY: 50 });
+    expect(screen.getByRole("dialog")).toBe(dialog);
+    fireEvent.pointerDown(dialog, { clientX: 50, clientY: 50 });
+    fireEvent.click(dialog, { clientX: 50, clientY: 50 });
+    expect(screen.queryByRole("dialog")).toBeNull();
+    fireEvent.click(trigger);
+    expect(screen.getByRole("dialog")).toBeTruthy();
+  },
+);

@@ -34,7 +34,7 @@ export class TmdbProvider implements MovieProvider {
     if (!token) throw new Error("TMDB_API_TOKEN is required, see TMDB terms before importing.");
     const out: unknown[] = [];
     for (const id of this.ids) {
-      const u = `https://api.themoviedb.org/3/movie/${id}?append_to_response=credits,translations,alternative_titles`;
+      const u = `https://api.themoviedb.org/3/movie/${id}?append_to_response=credits,translations,alternative_titles,keywords`;
       const r = await fetch(u, {
         headers: { Authorization: `Bearer ${token}` },
         signal: AbortSignal.timeout(20000),

@@ -137,7 +137,10 @@ export function Hints({
             onClick={() => setOpen(true)}
             disabled={pending || game.hints.remaining === 0}
           >
-            {t.hints} <span>{game.hints.remaining} / 2</span>
+            {t.hints}{" "}
+            <span>
+              {t.hintsUsed}: {game.hints.used.length} / 2
+            </span>
           </button>
           <p>
             {game.hints.unlocked === 0

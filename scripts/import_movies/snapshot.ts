@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { isDeepStrictEqual } from "node:util";
 import { z } from "zod";
 import { packSchema } from "../../apps/api/src/catalog.ts";
+import { baseGenres, subgenreDefinitions } from "../../packages/game-engine/src/genres.ts";
 import { type Movie, movieSchema } from "../../packages/game-engine/src/model.ts";
 
 export const snapshotSchema = z.object({
@@ -20,7 +21,24 @@ export function preservesSeed(base: Movie, enriched: Movie | undefined) {
     added[0]?.license === "TMDB-terms" &&
     /^https:\/\/www\.themoviedb\.org\/movie\/\d+$/.test(added[0].url) &&
     isDeepStrictEqual(enriched.provenance.slice(0, base.provenance.length), base.provenance) &&
-    isDeepStrictEqual({ ...enriched, actors: base.actors, provenance: base.provenance }, base)
+    (enriched.genreProfile
+      ? isDeepStrictEqual(enriched.genreProfile.legacy, base.genreProfile?.legacy ?? base.genres) &&
+        enriched.genres.every((g) => [...baseGenres.values()].some((b) => b.id === g.id)) &&
+        (enriched.subgenres ?? []).every((g) =>
+          subgenreDefinitions.some(([id]) => g.id === `subgenre:${id}`),
+        ) &&
+        isDeepStrictEqual(
+          {
+            ...enriched,
+            actors: base.actors,
+            provenance: base.provenance,
+            genres: base.genres,
+            subgenres: undefined,
+            genreProfile: undefined,
+          },
+          { ...base, subgenres: undefined, genreProfile: undefined },
+        )
+      : isDeepStrictEqual({ ...enriched, actors: base.actors, provenance: base.provenance }, base))
   );
 }
 export async function readSnapshot() {

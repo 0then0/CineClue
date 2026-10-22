@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { normalizeCountry } from "../../../packages/game-engine/src/countries.ts";
+import { genreIn } from "../../../packages/game-engine/src/genres.ts";
 import {
   type Difficulty,
   type Movie,
@@ -7,6 +9,7 @@ import {
   scoreCatalog,
 } from "../../../packages/game-engine/src/index.ts";
 import { createSearch } from "../../../packages/game-engine/src/search.ts";
+import { MIN_DAILY_VOTES, readDailyPool } from "./daily.ts";
 import { pool } from "./db.ts";
 export const packSchema = z.object({
   id: z.string(),
@@ -15,6 +18,7 @@ export const packSchema = z.object({
   rules: z.object({
     genreIds: z.array(z.string()).optional(),
     directorIds: z.array(z.string()).optional(),
+    countryIds: z.array(z.string()).optional(),
     yearMin: z.number().optional(),
     yearMax: z.number().optional(),
     movieIds: z.array(z.string()).optional(),
@@ -24,8 +28,9 @@ export type Pack = z.infer<typeof packSchema>;
 export function inPack(m: Movie, p: Pack) {
   const r = p.rules;
   return (
-    (!r.genreIds || m.genres.some((x) => r.genreIds?.includes(x.id))) &&
+    (!r.genreIds || genreIn(m, r.genreIds)) &&
     (!r.directorIds || m.directors.some((x) => r.directorIds?.includes(x.id))) &&
+    (!r.countryIds || m.countries.some((x) => r.countryIds?.includes(x.id))) &&
     (!r.yearMin || m.releaseYear >= r.yearMin) &&
     (!r.yearMax || m.releaseYear <= r.yearMax) &&
     (!r.movieIds || r.movieIds.includes(m.id))
@@ -38,7 +43,19 @@ export class Catalog {
   readonly movies: Movie[];
   readonly packs: Pack[];
   readonly sources: string[];
-  constructor(movies: Movie[], packs: Pack[]) {
+  readonly dailyVotes: ReadonlyMap<string, number>;
+  constructor(movies: Movie[], packs: Pack[], dailyVotes: ReadonlyMap<string, number> = new Map()) {
+    this.dailyVotes = dailyVotes;
+    const frequency = new Map<string, number>();
+    for (const m of movies)
+      for (const g of [...m.genres, ...(m.subgenres ?? [])])
+        frequency.set(g.id, (frequency.get(g.id) ?? 0) + 1);
+    movies = movies.map((m) => ({
+      ...m,
+      countries: m.countries.map(normalizeCountry),
+      genres: m.genres.map((g) => ({ ...g, frequency: frequency.get(g.id) })),
+      subgenres: m.subgenres?.map((g) => ({ ...g, frequency: frequency.get(g.id) })),
+    }));
     this.movies = movies;
     this.sources = [...new Set(movies.flatMap((m) => m.provenance.map((p) => p.provider)))].sort();
     this.packs = packs;
@@ -46,6 +63,25 @@ export class Catalog {
     this.byId = new Map(movies.map((m) => [m.id, m]));
     this.search = createSearch(movies);
     this.scores = scoreCatalog(movies);
+  }
+  dailyCandidates() {
+    return this.movies
+      .filter((m) => {
+        const score = this.scores.get(m.id);
+        return (
+          (this.dailyVotes.get(m.id) ?? 0) >= MIN_DAILY_VOTES &&
+          !!score &&
+          score.links >= 12 &&
+          score.guessabilityScore >= 75 &&
+          m.actors.length >= 3 &&
+          m.directors.length > 0 &&
+          m.genres.length > 0 &&
+          m.countries.length > 0 &&
+          m.studios.length > 0 &&
+          m.runtime > 0
+        );
+      })
+      .sort((a, b) => a.id.localeCompare(b.id));
   }
   candidates(difficulty: Difficulty, pack = "popular") {
     const p = this.packs.find((x) => x.id === pack);
@@ -76,6 +112,9 @@ export async function loadCatalog() {
   const movies = rows.map((r) =>
     movieSchema.parse({
       ...r,
+      genreProfile: r.genre_profile ?? undefined,
+      genres: r.genres.filter((g: { id: string }) => !g.id.startsWith("subgenre:")),
+      subgenres: r.genres.filter((g: { id: string }) => g.id.startsWith("subgenre:")),
       originalTitle: r.original_title,
       releaseYear: r.release_year,
       externalIds: r.external_ids,
@@ -87,5 +126,6 @@ export async function loadCatalog() {
     z
       .array(packSchema)
       .parse((await pool.query("SELECT * FROM content_pack ORDER BY (id='popular') DESC,id")).rows),
+    await readDailyPool(),
   );
 }

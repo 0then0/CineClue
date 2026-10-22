@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { historicalCountryCodes } from "../../../packages/game-engine/src/countries.ts";
 import type { MediaImage, MovieMedia } from "../../../packages/game-engine/src/model.ts";
 import type { Messages } from "./i18n.ts";
 import { cachedMovieMedia, loadMovieMedia } from "./media-cache.ts";
@@ -75,7 +76,7 @@ export function StudioLogo({ image }: { image?: MediaImage }) {
 }
 
 export function flag(iso?: string) {
-  return iso && /^[A-Z]{2}$/.test(iso) && !["SU", "DD", "CS", "YU"].includes(iso)
+  return iso && /^[A-Z]{2}$/.test(iso) && !historicalCountryCodes.has(iso)
     ? String.fromCodePoint(...[...iso].map((c) => 127397 + c.charCodeAt(0)))
     : "🌐";
 }

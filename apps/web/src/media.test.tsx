@@ -9,6 +9,7 @@ import {
 } from "../../../packages/game-engine/src/index.ts";
 import { Answer } from "./Answer.tsx";
 import { Clues } from "./Clues.tsx";
+import { countryCode } from "./countries.ts";
 import { dictionaries } from "./i18n.ts";
 import { flag } from "./Media.tsx";
 
@@ -245,4 +246,152 @@ it("places answer studios across both mobile columns like the other film metadat
     mobile.remove();
     style.remove();
   }
+});
+
+it("orders rarer matching genres first and distinguishes unavailable subgenre comparison", () => {
+  vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
+  const drama = { id: "drama", name: "Drama", names: {}, frequency: 4401 };
+  const thriller = { id: "thriller", name: "Thriller", names: {}, frequency: 2692 };
+  const subgenre = { id: "subgenre:slasher", name: "Slasher", names: {} };
+  const guessed = { ...movie, genres: [drama, thriller] };
+  const comparison = compareMovies(guessed, guessed);
+  comparison.genres = {
+    ...comparison.genres,
+    subgenres: { status: "miss", values: [subgenre], matches: [] },
+    subgenresComparable: false,
+  };
+  const game: GameView = {
+    id: "genre-detail",
+    mode: "unlimited",
+    date: null,
+    status: "playing",
+    maxAttempts: 8,
+    difficulty: "normal",
+    guesses: [{ movie: publicMovie(guessed), comparison }],
+    hints: { unlocked: 0, remaining: 0, nextUnlock: 3, options: [], used: [] },
+  };
+  const { container } = render(<Clues game={game} locale="en" t={dictionaries.en} />);
+  const genre = container.querySelector('[data-kind="genres"]') as HTMLElement;
+  expect(
+    Array.from(genre.querySelectorAll(":scope > .entity-list .entity-name"), (e) => e.textContent),
+  ).toEqual(["Thriller", "Drama"]);
+  expect(within(genre).getByText("Subgenres")).toBeTruthy();
+  expect(within(genre).getByText("No comparable subgenre data")).toBeTruthy();
+  expect(within(genre).getAllByText("Slasher")).toHaveLength(1);
+});
+
+it("shows country flags in guesses and answers while media requests are still pending", () => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(() => new Promise(() => {})),
+  );
+  const russian = {
+    ...movie,
+    id: "russian-country",
+    countries: [{ id: "Q159", name: "Russia", names: { ru: "Россия" } }],
+  };
+  const { unmount } = render(<Answer movie={russian} locale="ru" t={dictionaries.ru} />);
+  expect(screen.getByText("🇷🇺")).toBeTruthy();
+  expect(screen.queryByText("🌐")).toBeNull();
+  unmount();
+  render(
+    <Clues
+      game={{
+        id: "flag-guess",
+        mode: "daily",
+        date: null,
+        status: "playing",
+        difficulty: "normal",
+        maxAttempts: 8,
+        hints: { unlocked: 0, remaining: 0, nextUnlock: 3, options: [], used: [] },
+        guesses: [{ movie: publicMovie(russian), comparison: compareMovies(russian, russian) }],
+      }}
+      locale="ru"
+      t={dictionaries.ru}
+    />,
+  );
+  expect(screen.getByText("🇷🇺")).toBeTruthy();
+});
+it("resolves explicit country identities without names or modern successor guesses", () => {
+  expect(flag(countryCode("Q159"))).toBe("🇷🇺");
+  expect(flag(countryCode("Q55"))).toBe("🇳🇱");
+  expect(flag(countryCode("iso:JP"))).toBe("🇯🇵");
+  expect(flag(countryCode("new-country", "BR"))).toBe("🇧🇷");
+  expect(flag(countryCode("Q15180", "RU"))).toBe("🌐");
+  expect(flag(countryCode("Q713750", "DE"))).toBe("🌐");
+  expect(flag(countryCode("unmapped"))).toBe("🌐");
+});
+it("covers every current catalog country without media metadata", () => {
+  const catalog = JSON.parse(readFileSync("data/catalog.json", "utf8"));
+  for (const country of catalog.movies.flatMap((m: Movie) => m.countries)) {
+    expect(countryCode(country.id), country.id).not.toBeUndefined();
+  }
+});
+
+it.each(["en", "ru"] as const)(
+  "renders a stored Soviet country as USSR rather than Russia in guesses and answers (%s)",
+  (locale) => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => new Promise(() => {})),
+    );
+    const soviet = {
+      ...movie,
+      id: `soviet-${locale}`,
+      countries: [
+        { id: "iso:SU", name: "Soviet Union", names: { en: "Soviet Union", ru: "Россия" } },
+      ],
+    };
+    const label = locale === "ru" ? "СССР" : "Soviet Union";
+    const { unmount } = render(<Answer movie={soviet} locale={locale} t={dictionaries[locale]} />);
+    expect(screen.getByText(label)).toBeTruthy();
+    expect(screen.getByText("🌐")).toBeTruthy();
+    expect(screen.queryByText("Россия")).toBeNull();
+    unmount();
+    render(
+      <Clues
+        game={{
+          id: "stored-country",
+          mode: "daily",
+          date: null,
+          status: "playing",
+          difficulty: "normal",
+          maxAttempts: 8,
+          hints: { unlocked: 0, remaining: 0, nextUnlock: 3, options: [], used: [] },
+          guesses: [{ movie: publicMovie(soviet), comparison: compareMovies(soviet, soviet) }],
+        }}
+        locale={locale}
+        t={dictionaries[locale]}
+      />,
+    );
+    expect(screen.getByText(label)).toBeTruthy();
+    expect(screen.getByText("🌐")).toBeTruthy();
+    expect(screen.queryByText("Россия")).toBeNull();
+  },
+);
+
+it.each([
+  ["Q15180", "iso:SU", "СССР"],
+  ["Q55", "iso:NL", "Нидерланды"],
+])("highlights the guessed country %s when the target uses %s", (guessId, targetId, label) => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(() => new Promise(() => {})),
+  );
+  const guessed = { ...movie, countries: [{ id: guessId, name: label, names: { ru: label } }] };
+  const target = { ...movie, countries: [{ id: targetId, name: label, names: { ru: label } }] };
+  const game: GameView = {
+    id: "country-alias",
+    mode: "daily",
+    date: null,
+    status: "playing",
+    difficulty: "normal",
+    maxAttempts: 8,
+    hints: { unlocked: 0, remaining: 0, nextUnlock: 3, options: [], used: [] },
+    guesses: [{ movie: publicMovie(guessed), comparison: compareMovies(guessed, target) }],
+  };
+  const { container } = render(<Clues game={game} locale="ru" t={dictionaries.ru} />);
+  const cell = container.querySelector('[data-kind="countries"]');
+  expect(cell?.classList.contains("exact")).toBe(true);
+  expect(cell?.querySelector(".entity-token.matched .entity-name")?.textContent).toBe(label);
 });
