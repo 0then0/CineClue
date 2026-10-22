@@ -42,6 +42,10 @@ try {
     const selected = movies.filter((m) => !existing.has(m.id));
     const started = performance.now();
     await writeCatalog(client, selected, packs, preserve);
+    console.log("Refreshing catalog planner statistics");
+    await client.query(
+      "ANALYZE movie,alias,person,genre,country,studio,movie_person,movie_genre,movie_country,movie_studio,content_pack,movie_pack",
+    );
     await client.query("COMMIT");
     console.log(
       `Seeded ${selected.length} films and ${packs.length} packs; preserved ${movies.length - selected.length} existing films.`,
