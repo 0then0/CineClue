@@ -14,7 +14,7 @@ updates:
         update-types: [minor, patch]
     ignore:
       - dependency-name: "*"
-        update-types: [version-update:semver-major]
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -31,4 +31,4 @@ updates:
     # Runtime major changes must also update package.json engines and CI.
     ignore:
       - dependency-name: node
-        update-types: [version-update:semver-major]
+        update-types: ["version-update:semver-major"]
