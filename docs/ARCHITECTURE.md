@@ -1,6 +1,6 @@
 # Architecture
 
-CineClue is a TypeScript monorepo with a React/Vite frontend, a Node.js HTTP API and PostgreSQL. The API serves the built frontend in production. During development, Vite proxies `/api` to the API on port 3001.
+CineClue is a TypeScript monorepo with a React/Vite frontend, a Node.js HTTP API and PostgreSQL. On Netlify, the CDN serves the built frontend and a Function handles `/api/*`. The standalone Node server can also serve the frontend. During development, Vite proxies `/api` to the API on port 3001.
 
 ## Project layout
 
@@ -11,6 +11,7 @@ packages/game-engine/     Domain models, comparisons, search and difficulty scor
 data/                     Versioned catalog, source seed, collections and JSON Schema
 scripts/import_movies/    Provider adapters, catalog generation and database seeding
 scripts/validate_dataset/ Catalog and collection validation
+netlify/functions/        HTTP function entry point and scheduled rate-counter cleanup
 docker/                   Container image and startup script
 docs/                     API, data and deployment guides
 ```
@@ -43,7 +44,7 @@ An HttpOnly cookie identifies an anonymous visitor. The browser stores language,
 
 ## Runtime boundaries
 
-The API loads and validates the catalog at startup. Search and comparison operate on this in-memory catalog; PostgreSQL stores durable game state. Multiple API instances must share the database, catalog and Daily secret. Mutation rate counters are shared through PostgreSQL.
+The API loads and validates the catalog at startup. Netlify initializes it lazily once per warm instance; concurrent first requests share the initialization promise and failed initialization is retried by a later request. The same Fetch handler serves Node and Functions, preserving interactive PostgreSQL transactions. Netlify client identity comes only from `context.ip`. A daily scheduled function removes expired rate counters without loading the catalog; the standalone server retains its minute-based timer. Search and comparison operate on this in-memory catalog; PostgreSQL stores durable game state. Multiple API instances must share the database, catalog and Daily secret. Mutation rate counters are shared through PostgreSQL.
 
 Movie-provider credentials remain server-side. Media lookups are optional, have bounded concurrency and timeouts, and do not prevent gameplay. See [data and media](DATA.md) for caching and attribution, and [deployment](DEPLOYMENT.md) for public hosting.
 

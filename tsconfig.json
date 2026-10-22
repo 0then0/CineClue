@@ -13,5 +13,5 @@
     "skipLibCheck": true,
     "types": ["node", "vitest/globals"]
   },
-  "include": ["apps", "packages", "scripts", "vitest.config.ts"]
+  "include": ["netlify", "apps", "packages", "scripts", "vitest.config.ts"]
 }

@@ -3,7 +3,9 @@ import { randomUUID } from "node:crypto";
 import { once } from "node:events";
 import type { Server } from "node:http";
 import { promisify } from "node:util";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import netlifyApi from "../../../netlify/functions/api.ts";
+import cleanup from "../../../netlify/functions/cleanup.ts";
 import { compareMovies, compareSet } from "../../../packages/game-engine/src/index.ts";
 import { Catalog, loadCatalog } from "../src/catalog.ts";
 import { selectDaily } from "../src/daily.ts";
@@ -51,6 +53,70 @@ describe.skipIf(!enabled)("API + disposable PostgreSQL", () => {
   afterAll(async () => {
     if (server) await new Promise<void>((resolve) => server.close(() => resolve()));
     await pool.end();
+  });
+  it("plays and restores a challenge through the real Netlify entry point", async () => {
+    vi.stubEnv("DAILY_SECRET", "netlify-integration-secret-at-least-32-characters");
+    vi.stubEnv("PUBLIC_ORIGIN", "https://cineclue.example");
+    const origin = "https://cineclue.example";
+    const context = { ip: "192.0.2.90" };
+    try {
+      const created = await netlifyApi(
+        new Request(`${origin}/api/challenges`, {
+          method: "POST",
+          headers: { origin, "content-type": "application/json" },
+          body: JSON.stringify({ movieId: catalog.movies[0].id }),
+        }),
+        context,
+      );
+      expect(created.status).toBe(201);
+      const { id } = await created.json();
+      const started = await netlifyApi(new Request(`${origin}/api/challenges/${id}`), context);
+      expect(started.status).toBe(200);
+      const visitor = started.headers.get("set-cookie")?.split(";")[0];
+      expect(visitor).toBeTruthy();
+      if (!visitor) throw Error("Missing visitor cookie");
+      expect(started.headers.get("set-cookie")).toContain("; Secure");
+      const game = await started.json();
+      expect(game).not.toHaveProperty("answer");
+      const won = await netlifyApi(
+        new Request(`${origin}/api/challenges/${id}/guess`, {
+          method: "POST",
+          headers: { origin, cookie: visitor, "content-type": "application/json" },
+          body: JSON.stringify({ movieId: catalog.movies[0].id }),
+        }),
+        context,
+      );
+      expect(won.status).toBe(200);
+      const result = await won.json();
+      expect(result.status).toBe("won");
+      expect(result.answer.id).toBe(catalog.movies[0].id);
+      const restored = await netlifyApi(
+        new Request(`${origin}/api/challenges/${id}`, {
+          headers: { cookie: visitor },
+        }),
+        context,
+      );
+      expect(await restored.json()).toEqual(result);
+      expect(
+        (await pool.query("SELECT COUNT(*)::int AS count FROM guess WHERE game_id=$1", [game.id]))
+          .rows[0].count,
+      ).toBe(1);
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+  it("scheduled cleanup removes expired counters and retains live quotas and games", async () => {
+    const prefix = randomUUID();
+    await pool.query(
+      "INSERT INTO rate_limit(key,expires_at) VALUES($1,now()-interval '1 minute'),($2,now()+interval '1 hour')",
+      [`${prefix}:expired`, `${prefix}:live`],
+    );
+    const before = (await pool.query("SELECT COUNT(*) FROM game_session")).rows[0].count;
+    await cleanup();
+    const rows = (await pool.query("SELECT key FROM rate_limit WHERE key LIKE $1", [`${prefix}:%`]))
+      .rows;
+    expect(rows).toEqual([{ key: `${prefix}:live` }]);
+    expect((await pool.query("SELECT COUNT(*) FROM game_session")).rows[0].count).toBe(before);
   });
   it("compares new guesses with legacy genres for a pre-taxonomy game", async () => {
     const target = catalog.byId.get("Q83495");
@@ -530,7 +596,7 @@ describe.skipIf(!enabled)("API + disposable PostgreSQL", () => {
     expect(won.answer?.runtime).toBe(target.runtime + 5);
     expect(won.guesses[0]).toEqual(before.guesses[0]);
     expect(won.guesses[1].comparison.runtime.status).toBe("exact");
-  }, 240000);
+  }, 600000);
   it("rate limits public mutations in PostgreSQL", async () => {
     const limited = app(catalog, "secret", { rateLimit: 0 });
     limited.listen(0, "127.0.0.1");

@@ -10,7 +10,88 @@ docker compose up --build
 
 The initial 10,000-film import can take a few minutes. Subsequent starts reuse the database. The PostgreSQL volume persists until explicitly removed; do not use `docker compose down -v` when you need to retain progress.
 
-## Public hosting
+## Netlify + Neon: manual deployment
+
+Netlify serves `apps/web/dist` and routes `/api/*` to `netlify/functions/api.ts` before the SPA fallback. Challenge URLs such as `/challenge/<uuid>` load the frontend. The function shares the existing API handler with the Node server, including visitor cookies, origin checks, request-size limits and interactive `pg` transactions. No framework migration or additional application dependency is required.
+
+### 1. Create the Neon database
+
+Create a Neon project with **PostgreSQL 18**. Choose the same geographical region as the Netlify Functions region where possible. Keep scale-to-zero enabled if desired; the API has no polling timer in Functions.
+
+In Neon **Connect**, copy both connection strings for the same database and role:
+- **Pooled** URL, with `-pooler` in the hostname: used by the application.
+- **Direct** URL, without `-pooler`: used by migrations and catalog imports.
+
+Keep the TLS parameters supplied by Neon, including `sslmode=require` and `channel_binding=require` when present. Do not disable certificate verification. The existing `pg` driver keeps `BEGIN`, row locks and `COMMIT` on one client. [Neon pooling documentation](https://neon.com/docs/connect/connection-pooling).
+
+### 2. Create the Netlify project
+
+Import `0then0/CineClue` from GitHub, select production branch `main`, and leave the base/package directory at the repository root. Use the committed `netlify.toml`:
+- Build command: `pnpm build`.
+- Publish directory: `apps/web/dist`.
+- Functions directory: `netlify/functions`.
+- Node.js: 24; pnpm is pinned by `packageManager` in `package.json`.
+
+Do not add a Next.js adapter. Under **Project configuration → Build & deploy**, disable Deploy Previews and branch deploys. Leave builds **active**, because stopping builds also prevents manual hooks. The committed `ignore = "exit 0"` skips Git-triggered builds; [build hooks bypass the ignore command](https://docs.netlify.com/build/configure-builds/ignore-builds/).
+
+Choose the final site name/custom domain before setting `PUBLIC_ORIGIN`. In the Functions settings, choose a region close to Neon. The API requests 1024 MB of memory. Region changes and environment changes take effect on a new deployment.
+
+### 3. Set Netlify environment variables
+
+Under **Project configuration → Environment variables**, set these for the **Production** context with the **Functions** scope:
+- `DATABASE_URL`: the Neon **pooled** URL.
+- `DAILY_SECRET`: a stable random secret, generated locally with `openssl rand -hex 32`. Keep it across deployments and instances.
+- `PUBLIC_ORIGIN`: the exact public HTTPS origin, for example `https://cineclue-0then0.netlify.app`, with no path or trailing slash.
+- `TMDB_API_TOKEN`: optional server-side TMDB Read Access Token for missing media. The committed metadata works without it.
+
+Set `AWS_LAMBDA_JS_RUNTIME=nodejs24.x` in the Netlify UI with **Builds** scope to pin the function runtime. Netlify requires this override to be set outside `netlify.toml`. The build itself already selects Node 24. See [runtime configuration](https://docs.netlify.com/build/functions/configuration/).
+
+Do not use `VITE_` prefixes for secrets. Do not set `STATIC_ROOT`, `PORT` or `TRUSTED_PROXY_IP` for Functions. Secure cookies are always enabled by the function entry point; `context.ip` supplies the limiter identity and client forwarding headers are ignored. `NODE_ENV` is not used as a security switch by this entry point.
+
+Production secrets should not be shared with deploy previews or branch deploys. If previews are introduced later, use a separate Neon branch and a matching origin; the production configuration intentionally permits only its exact origin.
+
+### 4. Configure GitHub Actions
+
+In GitHub **Settings → Environments**, create an environment named `production`. Optionally add required reviewers to gate manual operations. Restrict its deployment branches to `main`.
+
+Under the `production` environment's **Secrets**, add:
+- `NEON_MIGRATION_DATABASE_URL`: the Neon **direct** URL.
+- `NETLIFY_BUILD_HOOK`: create a hook in Netlify **Build & deploy → Build hooks**, choose branch `main`, and copy its complete URL. Treat the URL as a secret. A repository Actions secret of the same name also works if no environment secret overrides it.
+
+No Netlify personal access token or site ID is required. Neither workflow runs on push or pull request. Ordinary CI continues to run automatically without publishing.
+
+### 5. Initialize the database, then deploy
+
+After these changes are committed to remote `main`:
+1. Open GitHub **Actions → Production database → Run workflow** on `main`. Choose `initialize-catalog`. This applies migrations, then imports the committed 10,000-film catalog only if the database is empty. It does not contact TMDB.
+2. Wait for successful completion. Import runs outside Functions in a single transaction and can take substantially longer over the network than locally. Use a nearby runner if network round trips become a bottleneck. A failed import rolls back its catalog transaction and can be retried; committed migrations remain applied.
+3. Open **Actions → Deploy production → Run workflow** on `main`.
+4. Follow the build in Netlify **Deploys**. A green GitHub deploy-trigger workflow means Netlify accepted the hook, not that publication succeeded. The hook builds the latest remote `main` when Netlify processes it; it does not pin the triggering workflow's SHA. Avoid pushing another commit while that build is queued if a specific revision is required.
+5. Open `https://<your-domain>/api/health`. Expect `{"status":"ok","movies":10000}`. Then test search, a guess, a hint, a challenge link opened directly, progress after reload, and both themes.
+6. In Netlify **Functions**, verify `api` and `cleanup`. `cleanup` should have a Scheduled badge. Use **Run now** to test it; scheduled functions are not public HTTP cleanup endpoints.
+
+For later schema-only changes, run the database workflow with `migrate` before deployment. `update-catalog` explicitly replaces catalog facts while preserving existing target snapshots. Back up the database before this operation, pause public writes while replacing catalog facts, then redeploy all functions so their in-memory catalogs match. A normal frontend/API deployment never migrates or imports data.
+
+### Runtime limits and cold-start measurement
+
+Each warm function instance reuses its catalog, search index, media metadata and PostgreSQL pool. The pool is capped at two connections per Lambda instance, closes idle connections after ten seconds while the instance is running, and has a fifteen-second connection timeout. Total database connections still grow with the number of concurrent function instances. No session-level database settings or independent HTTP queries replace interactive transactions.
+
+`cleanup` deletes only expired rate-limit rows daily at **04:15 UTC**. Expired rows are not consulted by a later minute's limiter. This avoids a database query every minute while the site is idle, but the daily cleanup itself can wake Neon. The standalone Node server keeps its existing cleanup timer.
+
+The function bundle includes `data/media.json` and `data/daily-pool.json`. They remain server-side; raw catalog snapshots are not copied into the public Vite output. No runtime writes to the deployed filesystem are required.
+
+On each cold initialization, the function logs an `api_initialized` event with catalog size, initialization duration, RSS and JavaScript heap usage. It does not log credentials or answers. Use those logs together with Netlify invocation duration/memory metrics to measure the first request after deployment and after Neon has suspended, then compare warm requests. Check several independent cold starts before opening public traffic.
+
+For a read-only local measurement against an explicitly configured database, run from the repository root in a fresh Node process:
+
+```sh
+AWS_LAMBDA_FUNCTION_NAME=benchmark PUBLIC_ORIGIN=https://benchmark.invalid \
+  node --env-file=.env scripts/benchmark-startup.ts
+```
+
+The script calls `/api/health` twice through the actual function runtime and closes the pool. It never applies migrations or imports data. A local PostgreSQL 18 run with the 10,000-film catalog measured about 2.5 seconds for initialization, 377 MiB RSS and a 1 ms warm health request; these are development-machine observations, not Netlify/Neon latency guarantees or peak-memory measurements. Netlify routing, packaging, TLS, region latency and Neon wake-up must be verified on the deployed site.
+
+## Standalone Docker hosting
 
 Build `docker/Dockerfile` and serve the API behind HTTPS termination. The image runs as the unprivileged `node` user and serves both `/api` and the built frontend. PostgreSQL must remain on a private network.
 

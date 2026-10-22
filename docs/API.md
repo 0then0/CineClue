@@ -52,7 +52,7 @@ The server checks ownership on session reads and mutations. It does not accept c
 
 Mutation bodies must be JSON objects no larger than 4096 bytes, without extra keys. Foreign `Origin` and `Sec-Fetch-Site: cross-site` POST requests are rejected. There is no wildcard CORS policy.
 
-The shared database-backed limit allows 60 mutations per remote IP per minute. A rejected request returns `429 rate_limited` and `Retry-After: 60`. GET requests do not consume this quota. See [deployment](DEPLOYMENT.md#proxy-identity-and-request-limits) for proxy identity and edge limits.
+The shared database-backed limit allows 60 mutations per remote IP per minute. A rejected request returns `429 rate_limited` and `Retry-After: 60`. GET requests do not consume this quota. Netlify Functions use the platform-provided `context.ip`; client-supplied forwarding headers cannot choose the quota identity. See [deployment](DEPLOYMENT.md#proxy-identity-and-request-limits) for proxy identity and edge limits.
 
 Errors use `{ "error": "code" }`:
 - **400:** `invalid_input`, `invalid_json`.
@@ -65,7 +65,7 @@ Errors use `{ "error": "code" }`:
 - **422:** `unknown_movie`, `no_candidates`, `hint_unavailable`.
 - **429:** `rate_limited`.
 - **500:** `internal_error`.
-- **503:** `catalog_unavailable`.
+- **503:** `catalog_unavailable`, `client_identity_unavailable`.
 
 Internal stack traces are logged server-side and are not returned to clients.
 

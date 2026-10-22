@@ -15,3 +15,5 @@ data/*.local.json.tmp
 *.dump
 
 data/*.json.tmp
+
+.netlify/

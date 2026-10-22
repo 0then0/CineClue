@@ -88,6 +88,10 @@ docker compose up -d --force-recreate app
 
 The token stays on the server. Wikimedia Commons provides licensed images where available. Image credits are available on each card; missing images leave readable placeholders. See [data and media](docs/DATA.md).
 
+## Host on Netlify + Neon
+
+The repository includes a Netlify Functions API, a static Vite build and manual GitHub Actions for deployment and database setup. Git pushes do not publish the site. Follow the [Netlify + Neon setup](docs/DEPLOYMENT.md#netlify--neon-manual-deployment) for secrets, the initial catalog import and the first deployment.
+
 ## Documentation
 
 - [Architecture](docs/ARCHITECTURE.md): project structure, game rules and persistence.

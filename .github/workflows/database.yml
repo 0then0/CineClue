@@ -1,0 +1,53 @@
+name: Production database
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Database operation (import uses the committed catalog, no TMDB calls)
+        type: choice
+        options: [migrate, initialize-catalog, update-catalog]
+        default: migrate
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-database
+  cancel-in-progress: false
+
+jobs:
+  database:
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Validate database configuration
+        env:
+          DATABASE_URL: ${{ secrets.NEON_MIGRATION_DATABASE_URL }}
+        run: node -e 'if (!process.env.DATABASE_URL) throw Error("Set NEON_MIGRATION_DATABASE_URL in the production environment secrets")'
+      - name: Apply migrations
+        env:
+          DATABASE_URL: ${{ secrets.NEON_MIGRATION_DATABASE_URL }}
+        run: pnpm db:migrate
+      - name: Import initial catalog only if empty
+        if: inputs.operation == 'initialize-catalog'
+        env:
+          DATABASE_URL: ${{ secrets.NEON_MIGRATION_DATABASE_URL }}
+        run: pnpm db:seed --if-empty
+      - name: Update catalog and preserve existing game snapshots
+        if: inputs.operation == 'update-catalog'
+        env:
+          DATABASE_URL: ${{ secrets.NEON_MIGRATION_DATABASE_URL }}
+        run: pnpm db:seed

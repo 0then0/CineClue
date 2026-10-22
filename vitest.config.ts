@@ -6,7 +6,12 @@ export default defineConfig({
         test: {
           name: "backend",
           environment: "node",
-          include: ["packages/**/*.test.ts", "apps/api/test/unit.test.ts", "scripts/**/*.test.ts"],
+          include: [
+            "packages/**/*.test.ts",
+            "apps/api/test/unit.test.ts",
+            "apps/api/test/functions.test.ts",
+            "scripts/**/*.test.ts",
+          ],
         },
       },
       {

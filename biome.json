@@ -4,6 +4,7 @@
     "includes": [
       "**",
       "!!**/dist",
+      "!!.netlify",
       "!!data/seed",
       "!!pnpm-lock.yaml",
       "!!apps/web/public/tmdb.svg",

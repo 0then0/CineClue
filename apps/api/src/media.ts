@@ -300,10 +300,12 @@ export const mediaSnapshotSchema = z.object({
   retrievedAt: z.iso.date(),
   movies: z.record(z.string(), movieMediaSchema),
 });
-export async function readMediaSnapshot() {
+export async function readMediaSnapshot(
+  path: string | URL = new URL("../../../data/media.json", import.meta.url),
+) {
   let raw: string;
   try {
-    raw = await readFile(new URL("../../../data/media.json", import.meta.url), "utf8");
+    raw = await readFile(path, "utf8");
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return {};
     throw error;
