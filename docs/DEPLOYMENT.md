@@ -34,7 +34,7 @@ Import `0then0/CineClue` from GitHub, select production branch `main`, and leave
 
 Do not add a Next.js adapter. Under **Project configuration → Build & deploy**, disable Deploy Previews and branch deploys. Leave builds **active**, because stopping builds also prevents manual hooks. The committed `ignore = "exit 0"` skips Git-triggered builds; [build hooks bypass the ignore command](https://docs.netlify.com/build/configure-builds/ignore-builds/).
 
-Choose the final site name/custom domain before setting `PUBLIC_ORIGIN`. In the Functions settings, choose a region close to Neon. The API requests 1024 MB of memory. Region changes and environment changes take effect on a new deployment.
+Choose the final site name/custom domain before setting `PUBLIC_ORIGIN`. In the Functions settings, choose a region close to Neon. The API uses the platform-default memory allocation; no custom `memory` or `vcpu` setting is configured, so deployment does not require the paid resource-configuration feature. Region changes and environment changes take effect on a new deployment.
 
 ### 3. Set Netlify environment variables
 
