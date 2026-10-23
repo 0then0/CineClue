@@ -10,6 +10,7 @@ import { Clues } from "./Clues.tsx";
 import { Confetti } from "./Confetti.tsx";
 import { api, HttpError, readStorage, writeStorage } from "./client.ts";
 import { useBackdropClose } from "./dialog.ts";
+import { FilmShelf } from "./FilmShelf.tsx";
 import { HelpDialog } from "./Help.tsx";
 import { Hints } from "./Hints.tsx";
 import { dictionaries, type Locale, type Messages, titleOf } from "./i18n.ts";
@@ -367,6 +368,38 @@ export default function App() {
           <img src="/icon.svg" width="38" height="38" alt="" />
           <span>CineClue</span>
         </a>
+        <nav className="mode-nav" aria-label={locale === "ru" ? "Режим игры" : "Game mode"}>
+          <button
+            type="button"
+            aria-current={mode === "daily" ? "page" : undefined}
+            onClick={() => navigate("/")}
+            disabled={pending}
+          >
+            {t.daily}
+            <span className="live-dot" />
+          </button>
+          <button
+            type="button"
+            aria-current={mode === "unlimited" ? "page" : undefined}
+            onClick={() => void newUnlimited()}
+            disabled={pending}
+          >
+            {t.unlimited}
+          </button>
+          <button
+            type="button"
+            aria-current={mode === "challenge" ? "page" : undefined}
+            onClick={() => {
+              setBuilder(true);
+              setCreatedChallenge(null);
+              setError(null);
+              setNotice("");
+            }}
+            disabled={pending}
+          >
+            {t.challenge}
+          </button>
+        </nav>
         <div className="utilities">
           <button
             type="button"
@@ -425,49 +458,20 @@ export default function App() {
         </div>
       </header>
       <main>
-        <nav className="mode-nav" aria-label={locale === "ru" ? "Режим игры" : "Game mode"}>
-          <button
-            type="button"
-            aria-current={mode === "daily" ? "page" : undefined}
-            onClick={() => navigate("/")}
-            disabled={pending}
-          >
-            {t.daily}
-            <span className="live-dot" />
-          </button>
-          <button
-            type="button"
-            aria-current={mode === "unlimited" ? "page" : undefined}
-            onClick={() => void newUnlimited()}
-            disabled={pending}
-          >
-            {t.unlimited}
-          </button>
-          <button
-            type="button"
-            aria-current={mode === "challenge" ? "page" : undefined}
-            onClick={() => {
-              setBuilder(true);
-              setCreatedChallenge(null);
-              setError(null);
-              setNotice("");
-            }}
-            disabled={pending}
-          >
-            {t.challenge}
-          </button>
-        </nav>
         <section className="intro">
-          <h1>{builder ? t.challengeTitle : t.headline}</h1>
-          <p>
-            {builder
-              ? t.challengeIntro
-              : mode === "unlimited"
-                ? t.practice
-                : mode === "challenge"
-                  ? t.friend
-                  : t.intro}
-          </p>
+          <div className="intro-copy">
+            <h1>{builder ? t.challengeTitle : t.headline}</h1>
+            <p>
+              {builder
+                ? t.challengeIntro
+                : mode === "unlimited"
+                  ? t.practice
+                  : mode === "challenge"
+                    ? t.friend
+                    : t.intro}
+            </p>
+          </div>
+          <FilmShelf label={t.posterArt} locale={locale} />
         </section>
         <section className="game-panel" aria-busy={pending}>
           {builder ? (
@@ -686,14 +690,12 @@ export default function App() {
           {catalogSize !== null && `${catalogSize} ${t.catalog} · `}
           {tmdbData ? t.mixedData : t.openData}
         </span>
-        {tmdbData && (
-          <div className="tmdb-credit catalog-credit">
-            <a href="https://www.themoviedb.org" target="_blank" rel="noreferrer">
-              <img src="/tmdb.svg" alt="TMDB" width="72" height="10" />
-            </a>
-            <p>This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
-          </div>
-        )}
+        <div className="tmdb-credit catalog-credit">
+          <a href="https://www.themoviedb.org" target="_blank" rel="noreferrer">
+            <img src="/tmdb.svg" alt="TMDB" width="72" height="10" />
+          </a>
+          <p>This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
+        </div>
       </footer>
       {showHelp && <HelpDialog t={t} onClose={() => setShowHelp(false)} />}
       {showStats && <StatsDialog records={records} t={t} onClose={() => setShowStats(false)} />}

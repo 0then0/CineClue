@@ -56,6 +56,7 @@ const en = {
   hint_used: "This hint has already been used.",
   hint_unavailable: "This category has no available data. Choose another hint.",
 
+  posterArt: "Poster art from TMDB. Decorative selection, unrelated to the mystery film.",
   headline: "Every guess tells a story.",
   intro: "One mystery film. Eight guesses. Find the connections and follow the clues.",
   today: "Today’s mystery",
@@ -213,6 +214,7 @@ const ru: Record<keyof typeof en, string> = {
   hint_used: "Эта подсказка уже использована.",
   hint_unavailable: "Для этой категории нет данных. Выберите другую подсказку.",
 
+  posterArt: "Постеры TMDB. Декоративная подборка, не связанная с загаданным фильмом.",
   headline: "Каждый ход раскрывает сюжет.",
   intro: "Один загаданный фильм. Восемь попыток. Находите связи и следуйте подсказкам.",
   today: "Сегодняшняя загадка",

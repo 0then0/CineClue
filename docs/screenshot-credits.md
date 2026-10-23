@@ -1,27 +1,22 @@
 # Screenshot credits
 
-The [README screenshot](screenshot.jpg) shows the current English interface in a demonstration Challenge. It is an unmodified browser capture at 2560 × 2109 pixels. Both posters, all 13 portrait instances and all four visible studio logos were loaded before capture. Keanu Reeves appears in both film cards.
+The [README screenshot](screenshot.jpg) shows the current English interface in a local demonstration Daily game. It is a browser capture at 2560 × 1800 pixels, saved as JPEG. All four visible posters, seven portraits and two studio logos were loaded before capture. The three header posters are decorative and unrelated to the mystery film.
 
 ## TMDB image sources
 
 These source pages identify the films, people and studios represented by TMDB-supplied images. They do not identify the original photographers or copyright holders. Posters and portraits are cropped interface thumbnails; studio logos retain their proportions.
-- [The Matrix Reloaded poster](https://www.themoviedb.org/movie/604).
+- [Amélie poster](https://www.themoviedb.org/movie/194).
+- [Arrival poster](https://www.themoviedb.org/movie/329865).
+- [Spirited Away poster](https://www.themoviedb.org/movie/129).
+- [The Matrix poster](https://www.themoviedb.org/movie/603).
 - [Lilly Wachowski](https://www.themoviedb.org/person/9339).
 - [Lana Wachowski](https://www.themoviedb.org/person/9340).
 - [Keanu Reeves](https://www.themoviedb.org/person/6384).
 - [Laurence Fishburne](https://www.themoviedb.org/person/2975).
 - [Carrie-Anne Moss](https://www.themoviedb.org/person/530).
 - [Hugo Weaving](https://www.themoviedb.org/person/1331).
-- [Jada Pinkett Smith](https://www.themoviedb.org/person/9575).
+- [Gloria Foster](https://www.themoviedb.org/person/9364).
 - [Silver Pictures](https://www.themoviedb.org/company/1885).
-- [John Wick poster](https://www.themoviedb.org/movie/245891).
-- [Chad Stahelski](https://www.themoviedb.org/person/40644).
-- [Michael Nyqvist](https://www.themoviedb.org/person/6283).
-- [Alfie Allen](https://www.themoviedb.org/person/71586).
-- [Willem Dafoe](https://www.themoviedb.org/person/5293).
-- [Dean Winters](https://www.themoviedb.org/person/68763).
-- [87Eleven](https://www.themoviedb.org/company/23008).
-- [Thunder Road](https://www.themoviedb.org/company/3528).
 
 ## Wikimedia Commons logo
 
