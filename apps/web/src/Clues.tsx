@@ -1,4 +1,3 @@
-import { countryName } from "../../../packages/game-engine/src/countries.ts";
 import type {
   Entity,
   GameView,
@@ -7,6 +6,7 @@ import type {
   NumericResult,
   SetResult,
 } from "../../../packages/game-engine/src/model.ts";
+import { countryName, entityName } from "./catalog-i18n.ts";
 import { countryCode } from "./countries.ts";
 import { type Locale, type Messages, titleOf } from "./i18n.ts";
 import { flag, MediaCredits, MediaPicture, StudioLogo, useMovieMedia } from "./Media.tsx";
@@ -28,8 +28,7 @@ function EntityValue({
   locale: Locale;
   t: Messages;
 }) {
-  const name =
-    kind === "countries" ? countryName(entity, locale) : (entity.names[locale] ?? entity.name);
+  const name = kind === "countries" ? countryName(entity, locale) : entityName(entity, locale);
   const person = kind === "directors" || kind === "actors";
   return (
     <span

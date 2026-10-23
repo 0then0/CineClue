@@ -22,6 +22,7 @@ Guess a mystery film through its connections to other movies. Each attempt compa
 ## Features
 
 - **Daily:** one shared puzzle, resetting at 00:00 UTC, with saved progress and browser statistics.
+- **Languages:** English, Russian, Spanish, German, French, Japanese and Brazilian Portuguese. The interface and built-in genre/collection labels are translated; film titles and personal names use the translations available in the catalog.
 - **Unlimited:** random puzzles with three difficulty levels and 42 film collections.
 - **Challenge:** choose a film and send a shareable puzzle link to a friend.
 - **10,000 films:** the catalog is included, so setup does not require a movie API key.

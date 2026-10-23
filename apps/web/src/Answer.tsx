@@ -1,5 +1,5 @@
-import { countryName } from "../../../packages/game-engine/src/countries.ts";
 import type { Movie } from "../../../packages/game-engine/src/model.ts";
+import { countryName, entityName } from "./catalog-i18n.ts";
 import { countryCode } from "./countries.ts";
 import { type Locale, type Messages, titleOf } from "./i18n.ts";
 import { flag, MediaCredits, MediaPicture, StudioLogo, useMovieMedia } from "./Media.tsx";
@@ -21,12 +21,11 @@ export function Answer({ movie, locale, t }: { movie: Movie; locale: Locale; t: 
             {movie.originalTitle} · {movie.releaseYear} · {movie.runtime} {t.min}
           </p>
           <p>
-            <b>{t.genres}:</b> {movie.genres.map((e) => e.names[locale] ?? e.name).join(", ")}
+            <b>{t.genres}:</b> {movie.genres.map((e) => entityName(e, locale)).join(", ")}
           </p>
           {!!movie.subgenres?.length && (
             <p>
-              <b>{t.subgenres}:</b>{" "}
-              {movie.subgenres.map((e) => e.names[locale] ?? e.name).join(", ")}
+              <b>{t.subgenres}:</b> {movie.subgenres.map((e) => entityName(e, locale)).join(", ")}
             </p>
           )}
           <p className="answer-countries">
@@ -46,7 +45,7 @@ export function Answer({ movie, locale, t }: { movie: Movie; locale: Locale; t: 
                   key={media.studios?.[e.id]?.url ?? e.id}
                   image={media.studios?.[e.id]}
                 />
-                <span>{e.names[locale] ?? e.name}</span>
+                <span>{entityName(e, locale)}</span>
               </span>
             ))}
           </div>
@@ -58,7 +57,7 @@ export function Answer({ movie, locale, t }: { movie: Movie; locale: Locale; t: 
             <h3>{t[kind]}</h3>
             <div className="answer-portraits">
               {movie[kind].map((person) => {
-                const name = person.names[locale] ?? person.name;
+                const name = entityName(person, locale);
                 return (
                   <div className="answer-person" key={person.id}>
                     <MediaPicture

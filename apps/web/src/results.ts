@@ -8,13 +8,16 @@ export const clueKeys = [
   "countries",
   "studios",
 ] as const;
-export function shareText(game: GameView) {
+export function shareText(
+  game: GameView,
+  labels = { daily: "Daily", challenge: "Challenge", unlimited: "Unlimited" },
+) {
   const label =
     game.mode === "daily"
-      ? `Daily ${game.date}`
+      ? `${labels.daily} ${game.date}`
       : game.mode === "challenge"
-        ? "Challenge"
-        : "Unlimited";
+        ? labels.challenge
+        : labels.unlimited;
   const grid = game.guesses
     .map((g) =>
       clueKeys

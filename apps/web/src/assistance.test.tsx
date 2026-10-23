@@ -183,7 +183,7 @@ it("locks hints before three misses and shows saved clues without reopening afte
       onUse={use}
     />,
   );
-  expect(screen.getByText("1990–е")).toBeTruthy();
+  expect(screen.getByText("1990–1999")).toBeTruthy();
   expect(
     screen.getByRole("button", { name: "Подсказки Использовано: 1 / 2" }).hasAttribute("disabled"),
   ).toBe(true);

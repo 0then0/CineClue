@@ -1,5 +1,33 @@
-export type Locale = "en" | "ru";
+import de from "./locales/de.json" with { type: "json" };
+import es from "./locales/es.json" with { type: "json" };
+import fr from "./locales/fr.json" with { type: "json" };
+import ja from "./locales/ja.json" with { type: "json" };
+import ptBR from "./locales/pt-BR.json" with { type: "json" };
+
+export const languages = [
+  { code: "en", flag: "🇬🇧", name: "English", short: "EN" },
+  { code: "ru", flag: "🇷🇺", name: "Русский", short: "RU" },
+  { code: "es", flag: "🇪🇸", name: "Español", short: "ES" },
+  { code: "de", flag: "🇩🇪", name: "Deutsch", short: "DE" },
+  { code: "fr", flag: "🇫🇷", name: "Français", short: "FR" },
+  { code: "ja", flag: "🇯🇵", name: "日本語", short: "JA" },
+  { code: "pt-BR", flag: "🇧🇷", name: "Português (Brasil)", short: "PT-BR" },
+] as const;
+export type Locale = (typeof languages)[number]["code"];
+export function isLocale(value: unknown): value is Locale {
+  return languages.some((language) => language.code === value);
+}
+export function detectLocale(preferences: readonly string[]): Locale {
+  for (const preference of preferences) {
+    const base = preference.toLowerCase().split("-")[0];
+    if (base === "pt") return "pt-BR";
+    if (isLocale(base)) return base;
+  }
+  return "en";
+}
 const en = {
+  language: "Language",
+  gameMode: "Game mode",
   daily: "Daily",
   unlimited: "Unlimited",
   challenge: "Challenge",
@@ -26,7 +54,7 @@ const en = {
     "Years within 3 and runtimes within 10 minutes are close. Use the arrow to narrow down the remaining range.",
   tipSearchTitle: "A title can have many names",
   tipSearchBody:
-    "Search Russian, English, original or alternative titles. Use ↑ and ↓ to select a suggestion, then Enter to guess.",
+    "Search available translated, original or alternative titles. Use ↑ and ↓ to select a suggestion, then Enter to guess.",
   tipStrategyTitle: "Change one connection",
   tipStrategyBody:
     "Try another film with a shared actor or director. Combine that connection with the year and runtime clues.",
@@ -65,7 +93,7 @@ const en = {
   remaining: "guesses left",
   search: "Which film are you thinking of?",
   placeholder: "Search for a film…",
-  searchHint: "Search English, Russian or original titles",
+  searchHint: "Search available translated or original titles",
   noResults: "No films found in this catalog. Try another title.",
   searching: "Searching…",
   loading: "Preparing the mystery…",
@@ -157,6 +185,8 @@ const en = {
   shareUnavailable: "Sharing is unavailable. You can copy the result below.",
 } as const;
 const ru: Record<keyof typeof en, string> = {
+  language: "Язык",
+  gameMode: "Режим игры",
   daily: "Фильм дня",
   unlimited: "Без границ",
   challenge: "Вызов",
@@ -183,7 +213,7 @@ const ru: Record<keyof typeof en, string> = {
     "Разница до 3 лет и до 10 минут считается близкой. Стрелка подскажет, в какую сторону сужать оставшийся диапазон.",
   tipSearchTitle: "У фильма бывает несколько названий",
   tipSearchBody:
-    "Ищите по русскому, английскому, оригинальному или альтернативному названию. Выбирайте вариант стрелками ↑ и ↓, затем нажмите Enter.",
+    "Ищите по доступному переводу, оригинальному или альтернативному названию. Выбирайте вариант стрелками ↑ и ↓, затем нажмите Enter.",
   tipStrategyTitle: "Проверьте одну из связей",
   tipStrategyBody:
     "Попробуйте другой фильм с общим актёром или режиссёром. Сопоставьте эту связь с подсказками о годе и длительности.",
@@ -223,7 +253,7 @@ const ru: Record<keyof typeof en, string> = {
   remaining: "попыток осталось",
   search: "Какой фильм вы задумали?",
   placeholder: "Найдите фильм…",
-  searchHint: "Поиск по русскому, английскому и оригинальному названию",
+  searchHint: "Поиск по доступным переводам и оригинальному названию",
   noResults: "В каталоге ничего не найдено. Попробуйте другое название.",
   searching: "Ищем…",
   loading: "Готовим загадку…",
@@ -313,7 +343,10 @@ const ru: Record<keyof typeof en, string> = {
   localUnavailable: "Хранилище браузера недоступно. Статистика не сохранится.",
   shareUnavailable: "Не удалось поделиться. Результат можно скопировать ниже.",
 };
-export const dictionaries = { en, ru };
+export const dictionaries = { en, ru, es, de, fr, ja, "pt-BR": ptBR } satisfies Record<
+  Locale,
+  Messages
+>;
 export type Messages = Record<keyof typeof en, string>;
 export const titleOf = (m: { title: string; titles: Record<string, string> }, locale: Locale) =>
-  m.titles[locale] ?? m.title;
+  m.titles[locale] ?? m.titles[locale.split("-")[0]] ?? m.titles.en ?? m.title;

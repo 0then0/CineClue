@@ -48,6 +48,7 @@ const playing: GameView = {
 };
 beforeEach(() => {
   localStorage.clear();
+  sessionStorage.clear();
   localStorage.setItem("cineclue:locale", '"en"');
   window.history.replaceState({}, "", "/");
 });
@@ -409,9 +410,11 @@ it("shows the selected film on challenge creation and clears it when choosing an
   const { container } = render(<App />);
   await screen.findByRole("combobox", { name: dictionaries.en.search });
   await user.click(screen.getByRole("button", { name: "Challenge" }));
+  expect(window.location.pathname).toBe("/challenge");
   await user.type(screen.getByRole("combobox", { name: dictionaries.en.search }), "Inter");
   await user.click(await screen.findByRole("option", { name: /Interstellar/ }));
   expect(await screen.findByRole("heading", { name: "Your challenge is ready." })).toBeTruthy();
+  expect(window.location.pathname).toBe("/challenge");
   expect(screen.getByRole("heading", { name: "Interstellar", level: 3 })).toBeTruthy();
   await waitFor(() =>
     expect(container.querySelector(".challenge-movie .movie-poster img")?.getAttribute("src")).toBe(

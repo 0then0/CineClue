@@ -8,17 +8,31 @@ import type {
 import { Answer } from "./Answer.tsx";
 import { Clues } from "./Clues.tsx";
 import { Confetti } from "./Confetti.tsx";
+import { packName } from "./catalog-i18n.ts";
 import { api, HttpError, readStorage, writeStorage } from "./client.ts";
 import { useBackdropClose } from "./dialog.ts";
 import { FilmShelf } from "./FilmShelf.tsx";
 import { HelpDialog } from "./Help.tsx";
 import { Hints } from "./Hints.tsx";
-import { dictionaries, type Locale, type Messages, titleOf } from "./i18n.ts";
+import {
+  detectLocale,
+  dictionaries,
+  isLocale,
+  type Locale,
+  languages,
+  type Messages,
+  titleOf,
+} from "./i18n.ts";
 import { MediaCredits, MediaPicture, useMovieMedia } from "./Media.tsx";
 import { readRecords, saveRecord } from "./records.ts";
 import { type DailyRecord, shareText, stats } from "./results.ts";
 import { Search } from "./Search.tsx";
 import { Tips } from "./Tips.tsx";
+import {
+  readUnlimitedSession,
+  saveUnlimitedSession,
+  type UnlimitedSession,
+} from "./unlimited-session.ts";
 
 type Pack = {
   id: string;
@@ -104,11 +118,10 @@ function StatsDialog({
 }
 export default function App() {
   const [locale, setLocale] = useState<Locale>(() => {
-    const l = readStorage<string>(
-      "cineclue:locale",
-      navigator.language.startsWith("ru") ? "ru" : "en",
-    );
-    return l === "ru" ? "ru" : "en";
+    const saved = readStorage<unknown>("cineclue:locale", null);
+    return isLocale(saved)
+      ? saved
+      : detectLocale(navigator.languages?.length ? navigator.languages : [navigator.language]);
   });
   const [theme, setTheme] = useState<Theme>(() => {
     const v = readStorage<string>("cineclue:theme", "system");
@@ -123,7 +136,7 @@ export default function App() {
   const [records, setRecords] = useState<DailyRecord[]>(readRecords);
   const [showHelp, setShowHelp] = useState(false);
   const [showStats, setShowStats] = useState(false);
-  const [builder, setBuilder] = useState(false);
+  const builder = path === "/challenge";
   const [createdChallenge, setCreatedChallenge] = useState<{
     url: string;
     movie: PublicMovie;
@@ -138,8 +151,27 @@ export default function App() {
   const [fallbackShare, setFallbackShare] = useState("");
   const t = dictionaries[locale];
   const requestId = useRef(0);
+  const unlimitedSession = useRef<UnlimitedSession | null>(readUnlimitedSession());
+  const startingUnlimited = useRef<Promise<GameView> | null>(null);
+  const startUnlimited = useCallback((difficulty: Difficulty, pack: string) => {
+    // StrictMode and repeated loads must share a single session-creation request.
+    if (!startingUnlimited.current) {
+      startingUnlimited.current = api<GameView>("/unlimited", { difficulty, pack })
+        .then((value) => {
+          const saved = { id: value.id, pack };
+          unlimitedSession.current = saved;
+          saveUnlimitedSession(saved);
+          return value;
+        })
+        .finally(() => {
+          startingUnlimited.current = null;
+        });
+    }
+    return startingUnlimited.current;
+  }, []);
   useEffect(() => {
     document.documentElement.lang = locale;
+    document.title = `CineClue · ${dictionaries[locale].headline}`;
     writeStorage("cineclue:locale", locale);
   }, [locale]);
   useEffect(() => {
@@ -149,7 +181,7 @@ export default function App() {
   useEffect(() => {
     const listener = () => {
       setPath(route());
-      setBuilder(false);
+      setCreatedChallenge(null);
     };
     window.addEventListener("popstate", listener);
     return () => window.removeEventListener("popstate", listener);
@@ -157,7 +189,7 @@ export default function App() {
   const navigate = useCallback((url: string) => {
     window.history.pushState({}, "", url);
     setPath(url);
-    setBuilder(false);
+    setCreatedChallenge(null);
     setNotice("");
     setFallbackShare("");
   }, []);
@@ -166,20 +198,61 @@ export default function App() {
     setPending(true);
     setError(null);
     setGame(null);
+    if (path === "/challenge") {
+      setPending(false);
+      return;
+    }
     try {
-      const endpoint = path.startsWith("/challenge/")
-        ? `/challenges/${path.split("/")[2]}`
-        : path.startsWith("/unlimited/")
-          ? path
-          : "/daily";
-      const value = await api<GameView>(endpoint);
-      if (id === requestId.current) setGame(value);
+      const legacyUnlimited = path.startsWith("/unlimited/");
+      let value: GameView;
+      if (path === "/unlimited") {
+        const active = unlimitedSession.current;
+        if (active) {
+          try {
+            value = await api<GameView>(`/unlimited/${encodeURIComponent(active.id)}`);
+          } catch (e) {
+            if (!(e instanceof HttpError) || e.code !== "not_found") throw e;
+            const replacement = unlimitedSession.current;
+            if (replacement && replacement.id !== active.id) {
+              value = await api<GameView>(`/unlimited/${encodeURIComponent(replacement.id)}`);
+            } else {
+              unlimitedSession.current = null;
+              saveUnlimitedSession(null);
+              value = await startUnlimited("normal", active.pack);
+            }
+          }
+        } else {
+          value = await startUnlimited("normal", "popular");
+        }
+      } else {
+        const endpoint = path.startsWith("/challenge/")
+          ? `/challenges/${path.split("/")[2]}`
+          : legacyUnlimited
+            ? path
+            : "/daily";
+        value = await api<GameView>(endpoint);
+      }
+      if (id === requestId.current) {
+        if (value.mode === "unlimited") {
+          const active = unlimitedSession.current;
+          const saved = { id: value.id, pack: active?.id === value.id ? active.pack : "popular" };
+          unlimitedSession.current = saved;
+          saveUnlimitedSession(saved);
+          setDifficulty(value.difficulty);
+          setPack(saved.pack);
+          if (legacyUnlimited) {
+            window.history.replaceState({}, "", "/unlimited");
+            setPath("/unlimited");
+          }
+        }
+        setGame(value);
+      }
     } catch (e) {
       if (id === requestId.current) setError(e);
     } finally {
       if (id === requestId.current) setPending(false);
     }
-  }, [path]);
+  }, [path, startUnlimited]);
   useEffect(() => {
     void load();
     return () => {
@@ -277,11 +350,15 @@ export default function App() {
   async function newUnlimited() {
     setPending(true);
     setError(null);
-    const id = requestId.current;
+    const id = ++requestId.current;
     try {
-      const value = await api<GameView>("/unlimited", { difficulty, pack });
+      const value = await startUnlimited(difficulty, pack);
       if (id === requestId.current) {
-        navigate(`/unlimited/${value.id}`);
+        const saved = { id: value.id, pack };
+        unlimitedSession.current = saved;
+        saveUnlimitedSession(saved);
+        setGame(value);
+        navigate("/unlimited");
       }
     } catch (e) {
       if (id === requestId.current) setError(e);
@@ -292,19 +369,22 @@ export default function App() {
   async function createChallenge(movie: PublicMovie) {
     setPending(true);
     setError(null);
+    const id = requestId.current;
     try {
       const value = await api<{ path: string }>("/challenges", { movieId: movie.id });
-      setCreatedChallenge({ url: `${window.location.origin}${value.path}`, movie });
+      if (id === requestId.current) {
+        setCreatedChallenge({ url: `${window.location.origin}${value.path}`, movie });
+      }
     } catch (e) {
-      setError(e);
+      if (id === requestId.current) setError(e);
       throw e;
     } finally {
-      setPending(false);
+      if (id === requestId.current) setPending(false);
     }
   }
   async function share() {
     if (!game) return;
-    const text = shareText(game);
+    const text = shareText(game, t);
     try {
       if (navigator.share) {
         try {
@@ -341,13 +421,13 @@ export default function App() {
   const mode = builder
     ? "challenge"
     : (game?.mode ??
-      (path.startsWith("/unlimited/")
+      (path === "/unlimited" || path.startsWith("/unlimited/")
         ? "unlimited"
         : path.startsWith("/challenge/")
           ? "challenge"
           : "daily"));
   const date = game?.date
-    ? new Intl.DateTimeFormat(locale === "ru" ? "ru-RU" : "en-GB", {
+    ? new Intl.DateTimeFormat(locale === "en" ? "en-GB" : locale, {
         day: "numeric",
         month: "long",
         year: "numeric",
@@ -368,7 +448,7 @@ export default function App() {
           <img src="/icon.svg" width="38" height="38" alt="" />
           <span>CineClue</span>
         </a>
-        <nav className="mode-nav" aria-label={locale === "ru" ? "Режим игры" : "Game mode"}>
+        <nav className="mode-nav" aria-label={t.gameMode}>
           <button
             type="button"
             aria-current={mode === "daily" ? "page" : undefined}
@@ -381,7 +461,9 @@ export default function App() {
           <button
             type="button"
             aria-current={mode === "unlimited" ? "page" : undefined}
-            onClick={() => void newUnlimited()}
+            onClick={() => {
+              if (path !== "/unlimited" || builder) navigate("/unlimited");
+            }}
             disabled={pending}
           >
             {t.unlimited}
@@ -390,7 +472,7 @@ export default function App() {
             type="button"
             aria-current={mode === "challenge" ? "page" : undefined}
             onClick={() => {
-              setBuilder(true);
+              if (path !== "/challenge") navigate("/challenge");
               setCreatedChallenge(null);
               setError(null);
               setNotice("");
@@ -447,14 +529,27 @@ export default function App() {
             <option value="light">☀ {t.light}</option>
             <option value="dark">☾ {t.dark}</option>
           </select>
-          <button
-            type="button"
-            className="language-button"
-            onClick={() => setLocale((l) => (l === "en" ? "ru" : "en"))}
-            aria-label={locale === "en" ? "Переключить на русский" : "Switch to English"}
+          <select
+            className="language-select"
+            data-locale={locale}
+            value={locale}
+            onChange={(e) => {
+              if (isLocale(e.target.value)) setLocale(e.target.value);
+            }}
+            aria-label={t.language}
+            title={`${t.language}: ${languages.find((language) => language.code === locale)?.name}`}
           >
-            {locale === "en" ? "RU" : "EN"}
-          </button>
+            {languages.map((language) => (
+              <option
+                key={language.code}
+                value={language.code}
+                lang={language.code}
+                aria-label={language.name}
+              >
+                {language.flag} {language.short}
+              </option>
+            ))}
+          </select>
         </div>
       </header>
       <main>
@@ -541,7 +636,7 @@ export default function App() {
                         .filter((p) => p.id === "popular")
                         .map((p) => (
                           <option value={p.id} key={p.id}>
-                            {p.name[locale] ?? p.name.en} ({p.counts?.[difficulty] ?? p.count})
+                            {packName(p, locale)} ({p.counts?.[difficulty] ?? p.count})
                           </option>
                         ))}
                       {(["genre", "country", "era", "director"] as const).map((category) => (
@@ -554,10 +649,7 @@ export default function App() {
                               category === "era"
                                 ? (a.rules?.yearMin ?? a.rules?.yearMax ?? 0) -
                                   (b.rules?.yearMin ?? b.rules?.yearMax ?? 0)
-                                : (a.name[locale] ?? a.name.en).localeCompare(
-                                    b.name[locale] ?? b.name.en,
-                                    locale,
-                                  ),
+                                : packName(a, locale).localeCompare(packName(b, locale), locale),
                             )
                             .map((p) => (
                               <option
@@ -565,7 +657,7 @@ export default function App() {
                                 key={p.id}
                                 disabled={(p.counts?.[difficulty] ?? p.count) === 0}
                               >
-                                {p.name[locale] ?? p.name.en} ({p.counts?.[difficulty] ?? p.count})
+                                {packName(p, locale)} ({p.counts?.[difficulty] ?? p.count})
                               </option>
                             ))}
                         </optgroup>

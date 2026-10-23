@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { GameHint, GameView, HintKind } from "../../../packages/game-engine/src/model.ts";
+import { entityName } from "./catalog-i18n.ts";
 import { HttpError, readStorage, writeStorage } from "./client.ts";
 import { type Locale, type Messages, titleOf } from "./i18n.ts";
 
@@ -18,12 +19,11 @@ const descriptions = {
 } as const;
 function HintContent({ hint, locale }: { hint: GameHint; locale: Locale }) {
   if ("values" in hint)
-    return <span>{hint.values.map((e) => e.names[locale] ?? e.name).join(" · ")}</span>;
+    return <span>{hint.values.map((e) => entityName(e, locale)).join(" · ")}</span>;
   if (hint.kind === "decade")
     return (
       <span>
-        {hint.decade}
-        {locale === "ru" ? "–е" : "s"}
+        {hint.decade}–{hint.decade + 9}
       </span>
     );
   return (

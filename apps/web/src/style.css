@@ -186,11 +186,6 @@ small {
   background: transparent;
   border-color: transparent;
 }
-.language-button {
-  background: transparent;
-  letter-spacing: 1px;
-  font-size: 12px;
-}
 .theme-select {
   max-width: 155px;
   font-size: 11px;
@@ -1056,9 +1051,6 @@ footer {
     letter-spacing: 0;
   }
   .utility-button {
-    padding: 8px;
-  }
-  .language-button {
     padding: 8px;
   }
   .clue-grid {
@@ -2153,6 +2145,7 @@ footer .catalog-credit {
   place-items: center;
   width: 38px;
   height: 38px;
+  min-height: 38px;
   flex-shrink: 0;
   padding: 6px;
   border: 1px solid var(--line);
@@ -2322,5 +2315,90 @@ footer .catalog-credit {
   }
   .guess-heading > span:last-child {
     grid-column: 2;
+  }
+}
+
+.language-select {
+  width: 64px;
+  flex-shrink: 0;
+  min-height: 42px;
+  padding: 8px 4px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--ink);
+  background: var(--paper);
+  font: inherit;
+  font-size: 12px;
+}
+.language-select[data-locale="pt-BR"] {
+  width: 84px;
+}
+:lang(ja) h1 {
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+:lang(ja) .clue-grid h3,
+:lang(ja) .guess-people h3 {
+  letter-spacing: 0;
+}
+.mode-nav button,
+.dialog-heading h2,
+.hint-choices strong,
+.panel-heading > span:first-child,
+.guess-people .people-status {
+  overflow-wrap: anywhere;
+}
+.dialog-heading h2 {
+  min-width: 0;
+}
+.dialog-heading button {
+  flex-shrink: 0;
+}
+@media (max-width: 540px) {
+  .site-header {
+    gap: 8px;
+  }
+  .brand {
+    font-size: 18px;
+    gap: 6px;
+  }
+  .brand img {
+    width: 30px;
+    height: 30px;
+  }
+  .utilities {
+    gap: 2px;
+  }
+  .utilities .utility-button {
+    width: 32px;
+    height: 32px;
+    min-height: 32px;
+    flex: 0 0 32px;
+    padding: 3px;
+  }
+  .utilities .utility-button svg {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+  .theme-select {
+    width: 28px;
+    padding: 3px;
+  }
+  .language-select {
+    padding: 4px 2px;
+  }
+  .mode-nav button {
+    min-width: 0;
+    padding: 9px 5px;
+    font-size: 12px;
+  }
+  .intro h1 {
+    overflow-wrap: anywhere;
+  }
+}
+@media (max-width: 360px) {
+  .brand {
+    font-size: 16px;
   }
 }
